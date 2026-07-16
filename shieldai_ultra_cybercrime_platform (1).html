@@ -1,0 +1,1323 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--pri:#0a0e1a;--sec:#0d1626;--acc:#00d4ff;--acc2:#ff3c5f;--acc3:#39ff14;--border:#1a2a4a;
+--card:#0f1c33;--text:#e0eaff;--muted:#4a6080;--warn:#ff9500;--danger:#ff3c5f;--safe:#39ff14;
+}
+body{font-family:'Rajdhani',sans-serif;background:var(--pri);color:var(--text);min-height:600px;overflow-x:hidden}
+.screen{display:none;min-height:600px;padding:0}
+.screen.active{display:block}
+/* SCANLINE EFFECT */
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.015) 2px,rgba(0,212,255,0.015) 4px);pointer-events:none;z-index:9999}
+/* LOGIN */
+#loginScreen{background:linear-gradient(135deg,#020812 0%,#0a1628 50%,#020812 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;min-height:600px}
+.logo-wrap{text-align:center;margin-bottom:40px}
+.logo-title{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--acc);letter-spacing:4px;text-transform:uppercase}
+.logo-title span{color:var(--acc2)}
+.logo-sub{font-size:13px;color:var(--muted);letter-spacing:6px;margin-top:4px}
+.shield-icon{width:80px;height:80px;margin:0 auto 16px;position:relative}
+.shield-icon svg{width:100%;height:100%}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:32px;width:100%;max-width:420px;position:relative}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--acc),transparent);border-radius:12px 12px 0 0}
+.tab-row{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tab-btn{flex:1;padding:10px;background:transparent;border:none;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:.2s}
+.tab-btn.active{background:var(--acc);color:#000;font-weight:600}
+.inp-group{margin-bottom:16px}
+.inp-group label{display:block;font-size:12px;color:var(--acc);letter-spacing:2px;margin-bottom:6px;text-transform:uppercase}
+.inp-group input,.inp-group select{width:100%;background:#060d1a;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;padding:12px 16px;border-radius:8px;outline:none;transition:.2s}
+.inp-group input:focus{border-color:var(--acc);box-shadow:0 0 0 2px rgba(0,212,255,0.15)}
+.pass-strength{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.pass-bar{height:100%;width:0;transition:.3s;border-radius:2px}
+.login-btn{width:100%;padding:14px;background:linear-gradient(90deg,var(--acc),#0095b3);border:none;color:#000;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:2px;border-radius:8px;cursor:pointer;transition:.2s;margin-top:8px}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,212,255,0.4)}
+.terms{font-size:11px;color:var(--muted);text-align:center;margin-top:12px}
+/* DASHBOARD */
+#dashScreen{background:var(--pri);padding:0}
+.topbar{background:var(--sec);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.topbar-logo{font-family:'Orbitron',monospace;font-size:16px;color:var(--acc);letter-spacing:3px}
+.topbar-logo span{color:var(--acc2)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.notif-bell{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:7px 10px;cursor:pointer;position:relative;font-size:14px}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--acc2);border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.user-chip{background:var(--card);border:1px solid var(--acc);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--acc)}
+.threat-banner{background:linear-gradient(90deg,rgba(255,60,95,0.15),rgba(255,60,95,0.05));border-bottom:1px solid rgba(255,60,95,0.3);padding:8px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--acc2)}
+.threat-dot{width:8px;height:8px;background:var(--acc2);border-radius:50%;animation:pulse 1s infinite;flex-shrink:0}
+.main-layout{display:flex;min-height:calc(600px - 100px)}
+.sidebar{width:200px;background:var(--sec);border-right:1px solid var(--border);padding:16px 0;flex-shrink:0}
+.nav-item{padding:11px 20px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:10px;transition:.2s;letter-spacing:.5px;border-left:3px solid transparent}
+.nav-item:hover{color:var(--acc);background:rgba(0,212,255,0.05)}
+.nav-item.active{color:var(--acc);background:rgba(0,212,255,0.08);border-left-color:var(--acc)}
+.nav-section{font-size:10px;color:var(--muted);letter-spacing:3px;padding:16px 20px 6px;text-transform:uppercase}
+.content-area{flex:1;padding:20px;overflow-y:auto;max-height:calc(600px - 100px)}
+/* PANELS */
+.panel{display:none}
+.panel.active{display:block}
+/* DEVICE SAFETY */
+.safety-ring-wrap{text-align:center;margin-bottom:24px}
+.safety-score{font-family:'Orbitron',monospace;font-size:48px;font-weight:900;color:var(--safe)}
+.safety-label{font-size:13px;color:var(--muted);letter-spacing:2px;margin-top:4px}
+.safety-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stat-card .sc-icon{font-size:20px;margin-bottom:8px}
+.stat-card .sc-val{font-size:20px;font-weight:600;color:var(--acc);font-family:'Orbitron',monospace}
+.stat-card .sc-label{font-size:12px;color:var(--muted);margin-top:2px}
+.stat-card.danger .sc-val{color:var(--danger)}
+.stat-card.warn .sc-val{color:var(--warn)}
+.stat-card.safe .sc-val{color:var(--safe)}
+/* ENGINES */
+.engine-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.engine-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.engine-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--acc);opacity:0;transition:.2s}
+.engine-card:hover{border-color:var(--acc);transform:translateY(-2px)}
+.engine-card:hover::before{opacity:1}
+.engine-card .ec-icon{font-size:28px;margin-bottom:10px}
+.engine-card .ec-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.engine-card .ec-desc{font-size:12px;color:var(--muted);line-height:1.4}
+.ec-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:8px;font-weight:600;letter-spacing:1px}
+.ec-badge.active{background:rgba(57,255,20,0.15);color:var(--safe)}
+.ec-badge.scanning{background:rgba(0,212,255,0.15);color:var(--acc)}
+.ec-badge.alert{background:rgba(255,60,95,0.15);color:var(--danger)}
+/* FIR */
+.fir-form{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px}
+.fir-title{font-family:'Orbitron',monospace;font-size:16px;color:var(--acc);margin-bottom:20px;letter-spacing:2px}
+.fir-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.fir-row.full{grid-template-columns:1fr}
+.fir-inp{width:100%;background:#060d1a;border:1px solid var(--border);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:14px;padding:10px 14px;border-radius:8px;outline:none}
+.fir-inp:focus{border-color:var(--acc)}
+.fir-inp::placeholder{color:var(--muted)}
+textarea.fir-inp{resize:vertical;min-height:80px}
+.fir-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:8px;border:none;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;letter-spacing:1px}
+.btn-pri{background:var(--acc);color:#000}
+.btn-pri:hover{box-shadow:0 0 16px rgba(0,212,255,0.4)}
+.btn-sec{background:transparent;border:1px solid var(--acc);color:var(--acc)}
+.btn-sec:hover{background:rgba(0,212,255,0.1)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{box-shadow:0 0 16px rgba(255,60,95,0.4)}
+.btn-warn{background:var(--warn);color:#000}
+.permission-box{background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:16px;margin-top:16px}
+.permission-box p{font-size:13px;color:var(--text);margin-bottom:10px}
+.perm-btns{display:flex;gap:8px}
+/* LIVE TEST */
+.test-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.test-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.test-card h4{font-size:14px;font-weight:600;margin-bottom:10px;color:var(--acc)}
+.test-scan-btn{width:100%;padding:10px;background:rgba(0,212,255,0.1);border:1px solid var(--acc);color:var(--acc);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;transition:.2s}
+.test-scan-btn:hover{background:rgba(0,212,255,0.2)}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin:10px 0;overflow:hidden}
+.progress-fill{height:100%;width:0;border-radius:2px;transition:width 2s ease}
+.test-result{font-size:12px;margin-top:8px;padding:8px;border-radius:6px;display:none}
+.test-result.safe{background:rgba(57,255,20,0.1);color:var(--safe);border:1px solid rgba(57,255,20,0.2)}
+.test-result.warn{background:rgba(255,149,0,0.1);color:var(--warn);border:1px solid rgba(255,149,0,0.2)}
+.test-result.danger{background:rgba(255,60,95,0.1);color:var(--danger);border:1px solid rgba(255,60,95,0.2)}
+/* NOTIF */
+.notif-panel{position:fixed;top:56px;right:16px;width:280px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;z-index:1000;display:none;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.notif-panel.show{display:block}
+.notif-item{padding:10px;border-radius:8px;margin-bottom:8px;font-size:12px;display:flex;gap:8px;align-items:flex-start}
+.notif-item.danger{background:rgba(255,60,95,0.1);border:1px solid rgba(255,60,95,0.2);color:var(--text)}
+.notif-item.info{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);color:var(--text)}
+.notif-item.warn{background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.2);color:var(--text)}
+.notif-time{font-size:11px;color:var(--muted);margin-top:2px}
+/* INDIA MAP THREAT */
+.threat-map{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.threat-map h4{font-size:13px;color:var(--acc);letter-spacing:2px;margin-bottom:12px;text-transform:uppercase}
+.city-threats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.city-item{background:#060d1a;border-radius:8px;padding:10px;text-align:center;border:1px solid var(--border)}
+.city-item .city{font-size:12px;color:var(--muted)}
+.city-item .count{font-family:'Orbitron',monospace;font-size:18px;font-weight:700}
+.city-item.high .count{color:var(--danger)}
+.city-item.med .count{color:var(--warn)}
+.city-item.low .count{color:var(--safe)}
+.recent-threats{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.threat-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
+.threat-row:last-child{border:none}
+.threat-type-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;min-width:90px;text-align:center}
+.th-deep{background:rgba(255,60,95,0.15);color:var(--danger)}
+.th-phish{background:rgba(255,149,0,0.15);color:var(--warn)}
+.th-voice{background:rgba(147,51,234,0.2);color:#c084fc}
+.th-wifi{background:rgba(0,212,255,0.15);color:var(--acc)}
+.th-data{background:rgba(239,68,68,0.15);color:#f87171}
+.threat-loc{color:var(--muted);font-size:12px;flex:1}
+.threat-time{color:var(--muted);font-size:11px}
+/* SECTION HEADERS */
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.section-header h2{font-family:'Orbitron',monospace;font-size:18px;color:var(--acc);letter-spacing:2px}
+.section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.reg-screen{background:var(--sec);border-radius:10px;padding:20px;margin-top:8px}
+/* LANGUAGE SELECTOR */
+.lang-wrap{position:relative;display:inline-block}
+.lang-btn{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--acc);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.lang-btn:hover{border-color:var(--acc)}
+.lang-dropdown{display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px;z-index:2000;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-height:320px;overflow-y:auto}
+.lang-dropdown.open{display:block}
+.lang-opt{padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap}
+.lang-opt:hover{background:rgba(0,212,255,0.08);color:var(--acc)}
+.lang-opt.selected{color:var(--acc);font-weight:600}
+/* LOGIN lang selector */
+.login-lang{position:absolute;top:16px;right:16px}
+</style>
+
+<h2 class="sr-only" style="display:none">ShieldAI Ultra — India's First AI Cybercrime Guardian Platform</h2>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="screen active">
+  <div style="position:absolute;top:16px;right:16px;z-index:10">
+    <div class="lang-wrap" id="loginLangWrap">
+      <button class="lang-btn" onclick="toggleLangMenu('loginLangDrop')">🌐 <span id="loginLangLabel">English</span> ▾</button>
+      <div class="lang-dropdown" id="loginLangDrop"></div>
+    </div>
+  </div>
+  <div class="logo-wrap">
+    <div class="shield-icon">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M40 8 L70 20 L70 45 C70 62 40 74 40 74 C40 74 10 62 10 45 L10 20 Z" stroke="#00d4ff" stroke-width="2" fill="rgba(0,212,255,0.08)"/>
+        <path d="M40 16 L62 26 L62 46 C62 59 40 68 40 68 C40 68 18 59 18 46 L18 26 Z" stroke="#00d4ff" stroke-width="1" fill="rgba(0,212,255,0.04)" opacity=".6"/>
+        <text x="40" y="52" text-anchor="middle" font-family="Orbitron" font-size="22" font-weight="900" fill="#00d4ff">AI</text>
+        <circle cx="40" cy="40" r="3" fill="#ff3c5f" opacity=".8">
+          <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".8;.3;.8" dur="2s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+    <div class="logo-title">SHIELD<span>AI</span> ULTRA</div>
+    <div class="logo-sub">India's First AI Cyber Guardian</div>
+  </div>
+
+  <div class="login-card">
+    <div id="loginForm">
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('login')">Login</button>
+        <button class="tab-btn" onclick="switchTab('register')">Register</button>
+      </div>
+      <div id="loginFields">
+        <div class="inp-group">
+          <label>Mobile / Email</label>
+          <input type="text" id="loginId" placeholder="+91 9XXXXXXXXX or email@domain.com"/>
+        </div>
+        <div class="inp-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Enter password"/>
+        </div>
+        <button class="login-btn" onclick="doLogin()">ACCESS SHIELD SYSTEM</button>
+        <p class="terms">By logging in, you agree to India's IT Act 2000 & CERT-In guidelines</p>
+      </div>
+      <div id="registerFields" style="display:none">
+        <div class="inp-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="As per Aadhaar"/>
+        </div>
+        <div class="inp-group">
+          <label>Mobile Number</label>
+          <input type="text" placeholder="+91 9XXXXXXXXX"/>
+        </div>
+        <div class="inp-group">
+          <label>Email ID</label>
+          <input type="email" placeholder="email@domain.com"/>
+        </div>
+        <div class="inp-group">
+          <label>Create Password</label>
+          <input type="password" id="newPass" placeholder="Min 8 chars, 1 uppercase, 1 symbol" oninput="checkStrength(this.value)"/>
+          <div class="pass-strength"><div class="pass-bar" id="passBar"></div></div>
+        </div>
+        <div class="inp-group">
+          <label>State</label>
+          <select class="fir-inp" style="background:#060d1a">
+            <option value="">Select State</option>
+            <option>Tamil Nadu</option><option>Maharashtra</option><option>Delhi</option>
+            <option>Karnataka</option><option>Telangana</option><option>West Bengal</option>
+            <option>Gujarat</option><option>Rajasthan</option><option>Uttar Pradesh</option>
+          </select>
+        </div>
+        <button class="login-btn" onclick="doLogin()">CREATE SECURE ACCOUNT</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD SCREEN -->
+<div id="dashScreen" class="screen">
+  <div class="topbar">
+    <div class="topbar-logo">SHIELD<span>AI</span> ULTRA</div>
+    <div class="topbar-right">
+      <div class="lang-wrap" id="dashLangWrap">
+        <button class="lang-btn" onclick="toggleLangMenu('dashLangDrop')">🌐 <span id="dashLangLabel">English</span> ▾</button>
+        <div class="lang-dropdown" id="dashLangDrop"></div>
+      </div>
+      <div class="notif-bell" onclick="toggleNotif()">🔔
+        <div class="notif-dot"></div>
+      </div>
+      <div class="user-chip">🛡 <span id="userName">User</span></div>
+      <button class="btn btn-sec" style="font-size:12px;padding:6px 12px" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="threat-banner">
+    <div class="threat-dot"></div>
+    <span>LIVE THREAT FEED: 3 active deepfake campaigns detected in Tamil Nadu | 7 phishing domains flagged today | Voice clone attempt blocked</span>
+  </div>
+  <div class="main-layout">
+    <div class="sidebar">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="showPanel('overview')">📊 Overview</div>
+      <div class="nav-item" onclick="showPanel('safety')">🛡 Device Safety</div>
+      <div class="nav-section">Engines</div>
+      <div class="nav-item" onclick="showPanel('engines')">⚙ Detection Engines</div>
+      <div class="nav-item" onclick="showPanel('livetest')">🔬 Live Test</div>
+      <div class="nav-section">Action</div>
+      <div class="nav-item" onclick="showPanel('fir')">📋 FIR Generator</div>
+      <div class="nav-item" onclick="showPanel('threats')">⚠ Active Threats</div>
+      <div class="nav-item" onclick="showPanel('tips')">💡 Cyber Tips</div>
+    </div>
+
+    <div class="content-area">
+      <!-- OVERVIEW -->
+      <div id="panel-overview" class="panel active">
+        <div class="section-header">
+          <h2>Overview</h2><div class="section-line"></div>
+        </div>
+        <div class="safety-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+          <div class="stat-card safe"><div class="sc-icon">🛡</div><div class="sc-val">87%</div><div class="sc-label">Device Safety</div></div>
+          <div class="stat-card danger"><div class="sc-icon">⚠</div><div class="sc-val">3</div><div class="sc-label">Active Threats</div></div>
+          <div class="stat-card warn"><div class="sc-icon">🔍</div><div class="sc-val">142</div><div class="sc-label">Scans Today</div></div>
+          <div class="stat-card"><div class="sc-icon">📋</div><div class="sc-val">2</div><div class="sc-label">FIRs Filed</div></div>
+        </div>
+        <div class="threat-map">
+          <h4>🇮🇳 Live Threat Heatmap — India</h4>
+          <div class="city-threats">
+            <div class="city-item high"><div class="count">47</div><div class="city">Mumbai</div></div>
+            <div class="city-item high"><div class="count">39</div><div class="city">Delhi</div></div>
+            <div class="city-item med"><div class="count">28</div><div class="city">Bangalore</div></div>
+            <div class="city-item med"><div class="count">21</div><div class="city">Chennai</div></div>
+            <div class="city-item med"><div class="count">19</div><div class="city">Hyderabad</div></div>
+            <div class="city-item low"><div class="count">11</div><div class="city">Coimbatore</div></div>
+          </div>
+        </div>
+        <div class="recent-threats">
+          <div style="font-size:13px;color:var(--acc);letter-spacing:2px;margin-bottom:12px;text-transform:uppercase">Recent Incidents</div>
+          <div class="threat-row"><span class="threat-type-badge th-deep">Deepfake</span><span class="threat-loc">Manipulated video call detected — Coimbatore</span><span class="threat-time">14:32</span></div>
+          <div class="threat-row"><span class="threat-type-badge th-phish">Phishing</span><span class="threat-loc">Fake SBI email campaign — 3,200 targets</span><span class="threat-time">13:15</span></div>
+          <div class="threat-row"><span class="threat-type-badge th-voice">Voice Clone</span><span class="threat-loc">PM impersonation audio — WhatsApp spread</span><span class="threat-time">11:47</span></div>
+          <div class="threat-row"><span class="threat-type-badge th-wifi">WiFi Hack</span><span class="threat-loc">Rogue hotspot — Bangalore Airport</span><span class="threat-time">10:22</span></div>
+          <div class="threat-row"><span class="threat-type-badge th-data">Data Leak</span><span class="threat-loc">Aadhaar-linked DB breach — 45K records</span><span class="threat-time">09:05</span></div>
+        </div>
+      </div>
+
+      <!-- SAFETY -->
+      <div id="panel-safety" class="panel">
+        <div class="section-header"><h2>Device Safety</h2><div class="section-line"></div></div>
+        <div class="safety-ring-wrap">
+          <div class="safety-score" id="safeScore">87</div>
+          <div class="safety-label">SAFETY SCORE / 100</div>
+          <div style="margin-top:12px">
+            <div style="height:12px;background:var(--border);border-radius:6px;overflow:hidden;max-width:300px;margin:0 auto">
+              <div style="height:100%;width:87%;background:linear-gradient(90deg,var(--acc),var(--safe));border-radius:6px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="safety-grid">
+          <div class="stat-card safe"><div class="sc-val">✓ ON</div><div class="sc-label">Firewall Status</div></div>
+          <div class="stat-card safe"><div class="sc-val">✓ v14.2</div><div class="sc-label">OS Updated</div></div>
+          <div class="stat-card danger"><div class="sc-val">3 Found</div><div class="sc-label">Suspicious APKs</div></div>
+          <div class="stat-card warn"><div class="sc-val">Weak</div><div class="sc-label">WiFi Encryption</div></div>
+          <div class="stat-card safe"><div class="sc-val">✓ Active</div><div class="sc-label">Antivirus</div></div>
+          <div class="stat-card warn"><div class="sc-val">2FA OFF</div><div class="sc-label">Email Security</div></div>
+          <div class="stat-card safe"><div class="sc-val">✓ VPN</div><div class="sc-label">Network Privacy</div></div>
+          <div class="stat-card danger"><div class="sc-val">Open</div><div class="sc-label">Bluetooth Risk</div></div>
+        </div>
+        <button class="btn btn-pri" style="margin-top:16px;width:100%" onclick="runFullScan()">RUN FULL DEVICE SCAN</button>
+        <div id="scanProgress" style="display:none;margin-top:16px">
+          <div style="font-size:12px;color:var(--acc);margin-bottom:6px" id="scanText">Scanning system files...</div>
+          <div class="progress-bar"><div class="progress-fill" id="scanBar" style="background:var(--acc)"></div></div>
+        </div>
+      </div>
+
+      <!-- ENGINES -->
+      <div id="panel-engines" class="panel">
+        <div class="section-header"><h2>Detection Engines</h2><div class="section-line"></div></div>
+        <div class="engine-grid">
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">🎭</div>
+            <div class="ec-name">Deepfake Detector</div>
+            <div class="ec-desc">AI-powered video/image analysis using facial inconsistency mapping & metadata forensics</div>
+            <span class="ec-badge active">ACTIVE</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">🎤</div>
+            <div class="ec-name">Voice Clone Scanner</div>
+            <div class="ec-desc">Detects synthetic audio via spectral analysis, prosody mapping & neural signature matching</div>
+            <span class="ec-badge active">ACTIVE</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">📧</div>
+            <div class="ec-name">Email Phishing Engine</div>
+            <div class="ec-desc">Scans headers, links, domains, sender spoofing & DKIM/SPF failures in real time</div>
+            <span class="ec-badge scanning">SCANNING</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">💧</div>
+            <div class="ec-name">Data Leakage Monitor</div>
+            <div class="ec-desc">Dark web crawler + breach database monitoring for your PII, Aadhaar, PAN & bank data</div>
+            <span class="ec-badge alert">2 ALERTS</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">📶</div>
+            <div class="ec-name">WiFi Threat Analyzer</div>
+            <div class="ec-desc">Detects rogue hotspots, MITM attacks, evil twin networks & WPS vulnerabilities</div>
+            <span class="ec-badge active">ACTIVE</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">💻</div>
+            <div class="ec-name">OS Exploit Scanner</div>
+            <div class="ec-desc">CVE database scan, kernel exploit detection, privilege escalation monitoring</div>
+            <span class="ec-badge scanning">SCANNING</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">📱</div>
+            <div class="ec-name">APK Malware Detector</div>
+            <div class="ec-desc">Static & dynamic analysis of Android APKs — detects spyware, RATs & banking trojans</div>
+            <span class="ec-badge alert">3 ALERTS</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">⚡</div>
+            <div class="ec-name">Cyber Threat Monitor</div>
+            <div class="ec-desc">Real-time threat intelligence from CERT-In, I4C & global honeypot networks</div>
+            <span class="ec-badge active">ACTIVE</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">🔒</div>
+            <div class="ec-name">Ransomware Guard</div>
+            <div class="ec-desc">Behavioral analysis of file encryption patterns, C2 communication & payload detection</div>
+            <span class="ec-badge active">ACTIVE</span>
+          </div>
+          <div class="engine-card" onclick="showPanel('livetest')">
+            <div class="ec-icon">📲</div>
+            <div class="ec-name">UPI/Banking Fraud</div>
+            <div class="ec-desc">Detects SIM swap fraud, UPI impersonation, vishing & OTP harvesting attempts</div>
+            <span class="ec-badge scanning">SCANNING</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE TEST -->
+      <div id="panel-livetest" class="panel">
+        <div class="section-header"><h2>Live Test</h2><div class="section-line"></div></div>
+        <div class="test-grid">
+          <div class="test-card">
+            <h4>🎭 Deepfake Test</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Upload image/video to test for AI manipulation</div>
+            <input type="file" accept="image/*,video/*" style="font-size:12px;color:var(--muted);margin-bottom:8px;width:100%"/>
+            <button class="test-scan-btn" onclick="runTest(this,'deepfake')">Run Deepfake Scan</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--acc)"></div></div>
+            <div class="test-result"></div>
+          </div>
+          <div class="test-card">
+            <h4>🎤 Voice Clone Test</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Upload audio file to detect synthetic voice</div>
+            <input type="file" accept="audio/*" style="font-size:12px;color:var(--muted);margin-bottom:8px;width:100%"/>
+            <button class="test-scan-btn" onclick="runTest(this,'voice')">Run Voice Analysis</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:#c084fc"></div></div>
+            <div class="test-result"></div>
+          </div>
+          <div class="test-card">
+            <h4>📧 Phishing Email Test</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Paste email header or URL to scan</div>
+            <textarea class="fir-inp" placeholder="Paste email header or suspicious URL..." style="min-height:60px;font-size:12px"></textarea>
+            <button class="test-scan-btn" onclick="runTest(this,'phishing')" style="margin-top:8px">Scan for Phishing</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--warn)"></div></div>
+            <div class="test-result"></div>
+          </div>
+          <div class="test-card">
+            <h4>📶 WiFi Security Test</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Scan current network for vulnerabilities</div>
+            <div style="font-size:12px;color:var(--text);padding:8px;background:#060d1a;border-radius:6px;margin-bottom:8px">Network: <span style="color:var(--acc)" id="wifiName">Detecting...</span></div>
+            <button class="test-scan-btn" onclick="runTest(this,'wifi')">Scan WiFi Security</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--acc)"></div></div>
+            <div class="test-result"></div>
+          </div>
+          <div class="test-card">
+            <h4>📱 APK Security Test</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Upload APK to check for malware</div>
+            <input type="file" accept=".apk" style="font-size:12px;color:var(--muted);margin-bottom:8px;width:100%"/>
+            <button class="test-scan-btn" onclick="runTest(this,'apk')">Analyze APK</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--warn)"></div></div>
+            <div class="test-result"></div>
+          </div>
+          <div class="test-card">
+            <h4>💻 OS Vulnerability Test</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Check OS for known CVEs and patches</div>
+            <div style="font-size:12px;color:var(--text);padding:8px;background:#060d1a;border-radius:6px;margin-bottom:8px">OS: <span style="color:var(--acc)">Android/Windows/iOS detected</span></div>
+            <button class="test-scan-btn" onclick="runTest(this,'os')">Scan OS Security</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--safe)"></div></div>
+            <div class="test-result"></div>
+          </div>
+          <div class="test-card">
+            <h4>💧 Data Leak Check</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Check if your data is on dark web</div>
+            <input class="fir-inp" placeholder="Enter email or phone to check..." style="font-size:12px;margin-bottom:8px"/>
+            <button class="test-scan-btn" onclick="runTest(this,'dataleak')">Check Dark Web</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--danger)"></div></div>
+            <div class="test-result"></div>
+          </div>
+          <div class="test-card">
+            <h4>🏦 UPI Fraud Test</h4>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Verify UPI ID or phone for fraud risk</div>
+            <input class="fir-inp" placeholder="Enter UPI ID or VPA..." style="font-size:12px;margin-bottom:8px"/>
+            <button class="test-scan-btn" onclick="runTest(this,'upi')">Check UPI Safety</button>
+            <div class="progress-bar"><div class="progress-fill" style="background:var(--acc)"></div></div>
+            <div class="test-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIR -->
+      <div id="panel-fir" class="panel">
+        <div class="section-header"><h2>FIR Generator</h2><div class="section-line"></div></div>
+        <div class="fir-form">
+          <div class="fir-title">📋 CYBER CRIME FIR — INDIA</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px;letter-spacing:1px">AS PER IT ACT 2000 & BHARTIYA NYAYA SANHITA 2023</div>
+          <div class="fir-row">
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">COMPLAINANT NAME</label><input class="fir-inp" placeholder="Full Name"/></div>
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">MOBILE NUMBER</label><input class="fir-inp" placeholder="+91 XXXXXXXXXX"/></div>
+          </div>
+          <div class="fir-row">
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">EMAIL ID</label><input class="fir-inp" placeholder="email@domain.com"/></div>
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">AADHAAR (last 4 digits)</label><input class="fir-inp" placeholder="XXXX"/></div>
+          </div>
+          <div class="fir-row">
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">CRIME TYPE</label>
+              <select class="fir-inp">
+                <option>Select Crime Type</option>
+                <option>Deepfake / AI Morphed Content</option>
+                <option>Voice Cloning / Impersonation</option>
+                <option>Email Phishing / Spear Phishing</option>
+                <option>Online Threat / Harassment</option>
+                <option>Data Breach / Leakage</option>
+                <option>WiFi Hacking / MITM Attack</option>
+                <option>OS / Device Exploitation</option>
+                <option>Malicious APK / Spyware</option>
+                <option>UPI / Banking Fraud</option>
+                <option>Ransomware Attack</option>
+                <option>Social Media Account Hack</option>
+                <option>Sextortion / Blackmail</option>
+                <option>OTP Fraud / SIM Swap</option>
+                <option>Identity Theft</option>
+              </select>
+            </div>
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">INCIDENT DATE & TIME</label><input class="fir-inp" type="datetime-local" id="incidentTime"/></div>
+          </div>
+          <div style="font-size:12px;color:var(--acc);margin:12px 0 8px;letter-spacing:2px;text-transform:uppercase">Suspect / Hacker Details (if known)</div>
+          <div class="fir-row">
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Suspect Name / Alias</label><input class="fir-inp" placeholder="Name or online alias"/></div>
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Suspect Mobile / Email</label><input class="fir-inp" placeholder="Contact if known"/></div>
+          </div>
+          <div class="fir-row">
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">IP Address (if available)</label><input class="fir-inp" placeholder="XXX.XXX.XXX.XXX"/></div>
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Platform / Website</label><input class="fir-inp" placeholder="WhatsApp, Instagram, URL etc."/></div>
+          </div>
+          <div class="fir-row">
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Financial Loss (₹)</label><input class="fir-inp" placeholder="Amount if financial fraud"/></div>
+            <div><label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Transaction ID / UTR</label><input class="fir-inp" placeholder="Bank reference number"/></div>
+          </div>
+          <div class="fir-row full">
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">INCIDENT DESCRIPTION</label><textarea class="fir-inp" placeholder="Describe the incident in detail — what happened, how it was discovered, what was compromised, evidence available..."></textarea></div>
+          </div>
+          <div class="fir-row full">
+            <div><label style="font-size:11px;color:var(--acc);display:block;margin-bottom:4px;letter-spacing:2px">EVIDENCE UPLOAD</label>
+              <input type="file" multiple accept="image/*,video/*,audio/*,.pdf,.txt" class="fir-inp" style="padding:8px"/>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Auto-captured: Device ID | Location | Timestamp | IP: <span style="color:var(--acc)">103.XX.XX.XX</span> | Browser fingerprint</div>
+          <div class="fir-actions">
+            <button class="btn btn-pri" onclick="generateFIR()">Generate FIR</button>
+            <button class="btn btn-sec" onclick="downloadFIR()">Download PDF</button>
+            <button class="btn btn-warn" onclick="showPermission()">Submit to CERT-In</button>
+            <button class="btn" style="background:rgba(57,255,20,0.1);color:var(--safe);border:1px solid rgba(57,255,20,0.3)" onclick="showPermission2()">Submit to Cybercrime.gov.in</button>
+          </div>
+          <div id="firPermBox" class="permission-box" style="display:none">
+            <p>🔐 Permission Required: Submit this FIR copy to <strong style="color:var(--acc)">CERT-In (cert-in.org.in)</strong> — India's national cybersecurity agency. Your data will be encrypted and only used for official investigation. Do you consent?</p>
+            <div class="perm-btns">
+              <button class="btn btn-pri" onclick="submitFIR('CERT-In')">Yes, Submit to CERT-In</button>
+              <button class="btn btn-sec" onclick="document.getElementById('firPermBox').style.display='none'">Cancel</button>
+            </div>
+          </div>
+          <div id="firPermBox2" class="permission-box" style="display:none">
+            <p>🔐 Permission Required: Submit this FIR copy to <strong style="color:var(--acc)">cybercrime.gov.in</strong> — India's official cybercrime reporting portal (I4C/MHA). Your complaint will receive a tracking ID. Do you consent?</p>
+            <div class="perm-btns">
+              <button class="btn btn-pri" onclick="submitFIR('cybercrime.gov.in')">Yes, Submit to Portal</button>
+              <button class="btn btn-sec" onclick="document.getElementById('firPermBox2').style.display='none'">Cancel</button>
+            </div>
+          </div>
+          <div id="firSuccess" style="display:none;margin-top:12px;padding:12px;background:rgba(57,255,20,0.08);border:1px solid rgba(57,255,20,0.2);border-radius:8px;font-size:13px;color:var(--safe)"></div>
+        </div>
+      </div>
+
+      <!-- THREATS -->
+      <div id="panel-threats" class="panel">
+        <div class="section-header"><h2>Active Threats</h2><div class="section-line"></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="background:rgba(255,60,95,0.08);border:1px solid rgba(255,60,95,0.3);border-radius:10px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="color:var(--danger);font-weight:600;font-size:14px">🎭 DEEPFAKE CAMPAIGN — HIGH SEVERITY</span>
+              <span style="font-size:11px;color:var(--muted)">Today 14:32</span>
+            </div>
+            <div style="font-size:13px;color:var(--text);margin-bottom:8px">AI-generated video using a politician's face is being circulated on WhatsApp in Tamil Nadu. Estimated 50,000 views. Flagged by ShieldAI NLP engine.</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-danger" style="font-size:12px;padding:7px 14px">Block & Report</button>
+              <button class="btn btn-sec" style="font-size:12px;padding:7px 14px" onclick="showPanel('fir')">File FIR</button>
+            </div>
+          </div>
+          <div style="background:rgba(255,149,0,0.08);border:1px solid rgba(255,149,0,0.3);border-radius:10px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="color:var(--warn);font-weight:600;font-size:14px">📧 PHISHING CAMPAIGN — MEDIUM</span>
+              <span style="font-size:11px;color:var(--muted)">Today 13:15</span>
+            </div>
+            <div style="font-size:13px;color:var(--text);margin-bottom:8px">Fake SBI KYC update email sent to 3,200 targets. Domain: sbi-kyc-update[.]in — registered today. SSL certificate mimics original.</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-danger" style="font-size:12px;padding:7px 14px">Block Domain</button>
+              <button class="btn btn-sec" style="font-size:12px;padding:7px 14px" onclick="showPanel('fir')">File FIR</button>
+            </div>
+          </div>
+          <div style="background:rgba(147,51,234,0.1);border:1px solid rgba(147,51,234,0.3);border-radius:10px;padding:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="color:#c084fc;font-weight:600;font-size:14px">🎤 VOICE CLONE DETECTED — MEDIUM</span>
+              <span style="font-size:11px;color:var(--muted)">Today 11:47</span>
+            </div>
+            <div style="font-size:13px;color:var(--text);margin-bottom:8px">Synthetic audio clip impersonating a senior bank official requesting OTP transfer. Spreading via Telegram. Confidence: 96.4% AI-generated.</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-danger" style="font-size:12px;padding:7px 14px">Report to I4C</button>
+              <button class="btn btn-sec" style="font-size:12px;padding:7px 14px" onclick="showPanel('fir')">File FIR</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIPS -->
+      <div id="panel-tips" class="panel">
+        <div class="section-header"><h2>Cyber Safety Tips</h2><div class="section-line"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+            <div style="font-size:20px;margin-bottom:8px">🎭</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Spot Deepfakes</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Look for unnatural eye blinking, lighting inconsistencies, blurry edges near face, and audio-video sync issues. Always verify via official channels.</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+            <div style="font-size:20px;margin-bottom:8px">📧</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Avoid Phishing</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Never click links in unexpected emails. Check sender domain carefully. Legitimate banks never ask OTP via email. Use official apps only.</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+            <div style="font-size:20px;margin-bottom:8px">📶</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">WiFi Safety</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Avoid public WiFi for banking. Use VPN. Check if network uses WPA3. Disable auto-connect. Watch for duplicate network names (evil twin attacks).</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+            <div style="font-size:20px;margin-bottom:8px">🏦</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">UPI Fraud Prevention</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Never share UPI PIN. Receiving money doesn't require PIN entry. Verify caller identity. Report fraud immediately via 1930 helpline.</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+            <div style="font-size:20px;margin-bottom:8px">📱</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Safe APK Practices</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Only install from Play Store / App Store. Avoid APKs from WhatsApp/Telegram. Check permissions before installing. Revoke unused permissions.</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+            <div style="font-size:20px;margin-bottom:8px">🔑</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Strong Passwords</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6">Use 12+ characters with symbols. Never reuse passwords. Enable 2FA everywhere. Use a password manager. Change passwords every 90 days.</div>
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:12px">
+          <div style="font-size:13px;font-weight:600;color:var(--acc);margin-bottom:10px">🆘 Emergency Cyber Helplines — India</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px">
+            <div style="background:#060d1a;border-radius:8px;padding:10px;text-align:center"><div style="color:var(--acc);font-family:'Orbitron',monospace;font-size:16px;font-weight:700">1930</div><div style="color:var(--muted);margin-top:2px">Cyber Crime Helpline</div></div>
+            <div style="background:#060d1a;border-radius:8px;padding:10px;text-align:center"><div style="color:var(--acc);font-family:'Orbitron',monospace;font-size:14px;font-weight:700">CERT-In</div><div style="color:var(--muted);margin-top:2px">cert-in.org.in</div></div>
+            <div style="background:#060d1a;border-radius:8px;padding:10px;text-align:center"><div style="color:var(--acc);font-family:'Orbitron',monospace;font-size:12px;font-weight:700">cybercrime.gov.in</div><div style="color:var(--muted);margin-top:2px">I4C / MHA Portal</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div style="font-size:13px;color:var(--acc);letter-spacing:2px;margin-bottom:12px">NOTIFICATIONS</div>
+  <div class="notif-item danger">
+    <div>
+      <div style="font-weight:600">Deepfake Detected Nearby</div>
+      <div style="color:var(--muted);margin-top:2px">Tamil Nadu region — 3 incidents flagged</div>
+      <div class="notif-time">2 min ago</div>
+    </div>
+  </div>
+  <div class="notif-item warn">
+    <div>
+      <div style="font-weight:600">Suspicious APKs Found</div>
+      <div style="color:var(--muted);margin-top:2px">3 apps requesting unusual permissions</div>
+      <div class="notif-time">18 min ago</div>
+    </div>
+  </div>
+  <div class="notif-item info">
+    <div>
+      <div style="font-weight:600">WiFi Security Alert</div>
+      <div style="color:var(--muted);margin-top:2px">Network uses WPA2 — upgrade recommended</div>
+      <div class="notif-time">1 hr ago</div>
+    </div>
+  </div>
+  <div class="notif-item danger">
+    <div>
+      <div style="font-weight:600">Data Breach Alert</div>
+      <div style="color:var(--muted);margin-top:2px">Email found in 2 breach databases</div>
+      <div class="notif-time">3 hrs ago</div>
+    </div>
+  </div>
+  <div class="notif-item info">
+    <div>
+      <div style="font-weight:600">CERT-In Advisory</div>
+      <div style="color:var(--muted);margin-top:2px">New phishing campaign targeting Indian banks</div>
+      <div class="notif-time">Today</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== TRANSLATIONS: 12 INDIAN LANGUAGES + ENGLISH ====== */
+const LANGS = [
+  {code:'en', label:'English', native:'English'},
+  {code:'hi', label:'Hindi', native:'हिन्दी'},
+  {code:'ta', label:'Tamil', native:'தமிழ்'},
+  {code:'te', label:'Telugu', native:'తెలుగు'},
+  {code:'kn', label:'Kannada', native:'ಕನ್ನಡ'},
+  {code:'ml', label:'Malayalam', native:'മലയാളം'},
+  {code:'mr', label:'Marathi', native:'मराठी'},
+  {code:'gu', label:'Gujarati', native:'ગુજરાતી'},
+  {code:'bn', label:'Bengali', native:'বাংলা'},
+  {code:'pa', label:'Punjabi', native:'ਪੰਜਾਬੀ'},
+  {code:'or', label:'Odia', native:'ଓଡ଼ିଆ'},
+  {code:'ur', label:'Urdu', native:'اردو'},
+  {code:'as', label:'Assamese', native:'অসমীয়া'},
+];
+
+const T = {
+  en:{
+    logoSub:"India's First AI Cyber Guardian",
+    loginTab:"Login",registerTab:"Register",
+    mobileLabel:"Mobile / Email",mobilePh:"+91 9XXXXXXXXX or email@domain.com",
+    passLabel:"Password",passPh:"Enter password",
+    loginBtn:"ACCESS SHIELD SYSTEM",
+    terms:"By logging in, you agree to India's IT Act 2000 & CERT-In guidelines",
+    fullNameLabel:"Full Name",fullNamePh:"As per Aadhaar",
+    mobileLabel2:"Mobile Number",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"Email ID",emailPh:"email@domain.com",
+    createPassLabel:"Create Password",createPassPh:"Min 8 chars, 1 uppercase, 1 symbol",
+    stateLabel:"State",selectState:"Select State",
+    registerBtn:"CREATE SECURE ACCOUNT",
+    navMain:"Main",navOverview:"📊 Overview",navSafety:"🛡 Device Safety",
+    navEngines:"Engines",navDetect:"⚙ Detection Engines",navLive:"🔬 Live Test",
+    navAction:"Action",navFir:"📋 FIR Generator",navThreats:"⚠ Active Threats",navTips:"💡 Cyber Tips",
+    logout:"Logout",
+    threatBanner:"LIVE THREAT FEED: 3 active deepfake campaigns detected in Tamil Nadu | 7 phishing domains flagged today | Voice clone attempt blocked",
+    notifications:"NOTIFICATIONS",
+    notif1Title:"Deepfake Detected Nearby",notif1Sub:"Tamil Nadu region — 3 incidents flagged",notif1Time:"2 min ago",
+    notif2Title:"Suspicious APKs Found",notif2Sub:"3 apps requesting unusual permissions",notif2Time:"18 min ago",
+    notif3Title:"WiFi Security Alert",notif3Sub:"Network uses WPA2 — upgrade recommended",notif3Time:"1 hr ago",
+    notif4Title:"Data Breach Alert",notif4Sub:"Email found in 2 breach databases",notif4Time:"3 hrs ago",
+    notif5Title:"CERT-In Advisory",notif5Sub:"New phishing campaign targeting Indian banks",notif5Time:"Today",
+    scanBtn:"RUN FULL DEVICE SCAN",safetyScore:"SAFETY SCORE / 100",
+    overview:"Overview",deviceSafety:"Device Safety",detectionEngines:"Detection Engines",liveTest:"Live Test",firGen:"FIR Generator",activeThreats:"Active Threats",cyberTips:"Cyber Safety Tips",
+  },
+  hi:{
+    logoSub:"भारत का पहला AI साइबर संरक्षक",
+    loginTab:"लॉगिन",registerTab:"रजिस्टर",
+    mobileLabel:"मोबाइल / ईमेल",mobilePh:"+91 9XXXXXXXXX या email@domain.com",
+    passLabel:"पासवर्ड",passPh:"पासवर्ड दर्ज करें",
+    loginBtn:"सिस्टम में प्रवेश करें",
+    terms:"लॉगिन करके आप भारत के IT अधिनियम 2000 और CERT-In दिशानिर्देशों से सहमत हैं",
+    fullNameLabel:"पूरा नाम",fullNamePh:"आधार के अनुसार",
+    mobileLabel2:"मोबाइल नंबर",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ईमेल आईडी",emailPh:"email@domain.com",
+    createPassLabel:"पासवर्ड बनाएं",createPassPh:"न्यूनतम 8 अक्षर, 1 बड़ा अक्षर, 1 चिन्ह",
+    stateLabel:"राज्य",selectState:"राज्य चुनें",
+    registerBtn:"सुरक्षित खाता बनाएं",
+    navMain:"मुख्य",navOverview:"📊 अवलोकन",navSafety:"🛡 डिवाइस सुरक्षा",
+    navEngines:"इंजन",navDetect:"⚙ डिटेक्शन इंजन",navLive:"🔬 लाइव टेस्ट",
+    navAction:"कार्रवाई",navFir:"📋 FIR जनरेटर",navThreats:"⚠ सक्रिय खतरे",navTips:"💡 साइबर सुझाव",
+    logout:"लॉगआउट",
+    threatBanner:"लाइव थ्रेट फ़ीड: तमिलनाडु में 3 सक्रिय डीपफेक अभियान | आज 7 फिशिंग डोमेन | वॉयस क्लोन प्रयास ब्लॉक",
+    notifications:"सूचनाएं",
+    notif1Title:"पास में डीपफेक मिला",notif1Sub:"तमिलनाडु — 3 घटनाएं चिह्नित",notif1Time:"2 मिनट पहले",
+    notif2Title:"संदिग्ध APK मिले",notif2Sub:"3 ऐप्स असामान्य अनुमतियां मांग रहे हैं",notif2Time:"18 मिनट पहले",
+    notif3Title:"WiFi सुरक्षा चेतावनी",notif3Sub:"नेटवर्क WPA2 उपयोग कर रहा है — अपग्रेड करें",notif3Time:"1 घंटे पहले",
+    notif4Title:"डेटा उल्लंघन चेतावनी",notif4Sub:"ईमेल 2 उल्लंघन डेटाबेस में मिला",notif4Time:"3 घंटे पहले",
+    notif5Title:"CERT-In सलाह",notif5Sub:"भारतीय बैंकों पर नया फिशिंग अभियान",notif5Time:"आज",
+    scanBtn:"पूर्ण डिवाइस स्कैन करें",safetyScore:"सुरक्षा स्कोर / 100",
+    overview:"अवलोकन",deviceSafety:"डिवाइस सुरक्षा",detectionEngines:"डिटेक्शन इंजन",liveTest:"लाइव टेस्ट",firGen:"FIR जनरेटर",activeThreats:"सक्रिय खतरे",cyberTips:"साइबर सुरक्षा सुझाव",
+  },
+  ta:{
+    logoSub:"இந்தியாவின் முதல் AI சைபர் காவலர்",
+    loginTab:"உள்நுழைய",registerTab:"பதிவு செய்",
+    mobileLabel:"மொபைல் / மின்னஞ்சல்",mobilePh:"+91 9XXXXXXXXX அல்லது email@domain.com",
+    passLabel:"கடவுச்சொல்",passPh:"கடவுச்சொல் உள்ளிடவும்",
+    loginBtn:"கணினியில் அணுகவும்",
+    terms:"உள்நுழைவதன் மூலம் நீங்கள் IT சட்டம் 2000 & CERT-In வழிகாட்டுதல்களை ஏற்கிறீர்கள்",
+    fullNameLabel:"முழு பெயர்",fullNamePh:"ஆதார் படி",
+    mobileLabel2:"மொபைல் எண்",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"மின்னஞ்சல் ID",emailPh:"email@domain.com",
+    createPassLabel:"கடவுச்சொல் உருவாக்கவும்",createPassPh:"குறைந்தது 8 எழுத்துகள், 1 பெரிய எழுத்து, 1 சின்னம்",
+    stateLabel:"மாநிலம்",selectState:"மாநிலம் தேர்ந்தெடுக்கவும்",
+    registerBtn:"பாதுகாப்பான கணக்கு உருவாக்கவும்",
+    navMain:"முக்கிய",navOverview:"📊 கண்ணோட்டம்",navSafety:"🛡 சாதன பாதுகாப்பு",
+    navEngines:"இயந்திரங்கள்",navDetect:"⚙ கண்டறிதல் இயந்திரங்கள்",navLive:"🔬 நேரடி சோதனை",
+    navAction:"நடவடிக்கை",navFir:"📋 FIR ஜெனரேட்டர்",navThreats:"⚠ செயலில் உள்ள அச்சுறுத்தல்கள்",navTips:"💡 சைபர் குறிப்புகள்",
+    logout:"வெளியேறு",
+    threatBanner:"நேரடி அச்சுறுத்தல் தகவல்: தமிழ்நாட்டில் 3 டீப்ஃபேக் பிரச்சாரங்கள் | இன்று 7 ஃபிஷிங் டொமைன்கள் | குரல் நகல் முயற்சி தடுக்கப்பட்டது",
+    notifications:"அறிவிப்புகள்",
+    notif1Title:"அருகில் டீப்ஃபேக் கண்டறியப்பட்டது",notif1Sub:"தமிழ்நாடு — 3 சம்பவங்கள்",notif1Time:"2 நிமிடம் முன்பு",
+    notif2Title:"சந்தேகமான APK கள் கண்டறியப்பட்டன",notif2Sub:"3 பயன்பாடுகள் அசாதாரண அனுமதிகளை கேட்கின்றன",notif2Time:"18 நிமிடங்கள் முன்பு",
+    notif3Title:"WiFi பாதுகாப்பு எச்சரிக்கை",notif3Sub:"நெட்வொர்க் WPA2 பயன்படுத்துகிறது — மேம்படுத்தவும்",notif3Time:"1 மணி நேரம் முன்பு",
+    notif4Title:"தரவு மீறல் எச்சரிக்கை",notif4Sub:"மின்னஞ்சல் 2 மீறல் தரவுத்தளங்களில் கண்டறியப்பட்டது",notif4Time:"3 மணி நேரம் முன்பு",
+    notif5Title:"CERT-In ஆலோசனை",notif5Sub:"இந்திய வங்கிகளை குறிவைக்கும் புதிய ஃபிஷிங் பிரச்சாரம்",notif5Time:"இன்று",
+    scanBtn:"முழு சாதன ஸ்கேன் இயக்கவும்",safetyScore:"பாதுகாப்பு மதிப்பெண் / 100",
+    overview:"கண்ணோட்டம்",deviceSafety:"சாதன பாதுகாப்பு",detectionEngines:"கண்டறிதல் இயந்திரங்கள்",liveTest:"நேரடி சோதனை",firGen:"FIR ஜெனரேட்டர்",activeThreats:"செயலில் உள்ள அச்சுறுத்தல்கள்",cyberTips:"சைபர் பாதுகாப்பு குறிப்புகள்",
+  },
+  te:{
+    logoSub:"భారతదేశపు మొదటి AI సైబర్ రక్షకుడు",
+    loginTab:"లాగిన్",registerTab:"నమోదు",
+    mobileLabel:"మొబైల్ / ఇమెయిల్",mobilePh:"+91 9XXXXXXXXX లేదా email@domain.com",
+    passLabel:"పాస్‌వర్డ్",passPh:"పాస్‌వర్డ్ నమోదు చేయండి",
+    loginBtn:"సిస్టమ్‌లోకి ప్రవేశించండి",
+    terms:"లాగిన్ చేయడం ద్వారా మీరు IT చట్టం 2000 & CERT-In మార్గదర్శకాలకు అంగీకరిస్తారు",
+    fullNameLabel:"పూర్తి పేరు",fullNamePh:"ఆధార్ ప్రకారం",
+    mobileLabel2:"మొబైల్ నంబర్",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ఇమెయిల్ ID",emailPh:"email@domain.com",
+    createPassLabel:"పాస్‌వర్డ్ సృష్టించండి",createPassPh:"కనీసం 8 అక్షరాలు, 1 పెద్ద అక్షరం, 1 చిహ్నం",
+    stateLabel:"రాష్ట్రం",selectState:"రాష్ట్రం ఎంచుకోండి",
+    registerBtn:"సురక్షిత ఖాతా సృష్టించండి",
+    navMain:"ప్రధాన",navOverview:"📊 అవలోకనం",navSafety:"🛡 పరికర భద్రత",
+    navEngines:"ఇంజిన్లు",navDetect:"⚙ గుర్తింపు ఇంజిన్లు",navLive:"🔬 లైవ్ టెస్ట్",
+    navAction:"చర్య",navFir:"📋 FIR జనరేటర్",navThreats:"⚠ క్రియాశీల బెదిరింపులు",navTips:"💡 సైబర్ చిట్కాలు",
+    logout:"లాగ్ అవుట్",
+    threatBanner:"లైవ్ థ్రెట్ ఫీడ్: తమిళనాడులో 3 డీప్‌ఫేక్ ప్రచారాలు | నేడు 7 ఫిషింగ్ డొమైన్లు | వాయిస్ క్లోన్ ప్రయత్నం నిరోధించబడింది",
+    notifications:"నోటిఫికేషన్లు",
+    notif1Title:"సమీపంలో డీప్‌ఫేక్ గుర్తించబడింది",notif1Sub:"తమిళనాడు — 3 సంఘటనలు",notif1Time:"2 నిమిషాల క్రితం",
+    notif2Title:"అనుమానాస్పద APKలు కనుగొనబడ్డాయి",notif2Sub:"3 యాప్‌లు అసాధారణ అనుమతులు అడుగుతున్నాయి",notif2Time:"18 నిమిషాల క్రితం",
+    notif3Title:"WiFi భద్రతా హెచ్చరిక",notif3Sub:"నెట్‌వర్క్ WPA2 వాడుతోంది — అప్‌గ్రేడ్ చేయండి",notif3Time:"1 గంట క్రితం",
+    notif4Title:"డేటా ఉల్లంఘన హెచ్చరిక",notif4Sub:"ఇమెయిల్ 2 ఉల్లంఘన డేటాబేస్‌లలో కనుగొనబడింది",notif4Time:"3 గంటల క్రితం",
+    notif5Title:"CERT-In సలహా",notif5Sub:"భారతీయ బ్యాంకులపై కొత్త ఫిషింగ్ ప్రచారం",notif5Time:"నేడు",
+    scanBtn:"పూర్తి పరికర స్కాన్ అమలు చేయండి",safetyScore:"భద్రతా స్కోర్ / 100",
+    overview:"అవలోకనం",deviceSafety:"పరికర భద్రత",detectionEngines:"గుర్తింపు ఇంజిన్లు",liveTest:"లైవ్ టెస్ట్",firGen:"FIR జనరేటర్",activeThreats:"క్రియాశీల బెదిరింపులు",cyberTips:"సైబర్ భద్రతా చిట్కాలు",
+  },
+  kn:{
+    logoSub:"ಭಾರತದ ಮೊದಲ AI ಸೈಬರ್ ರಕ್ಷಕ",
+    loginTab:"ಲಾಗಿನ್",registerTab:"ನೋಂದಣಿ",
+    mobileLabel:"ಮೊಬೈಲ್ / ಇಮೇಲ್",mobilePh:"+91 9XXXXXXXXX ಅಥವಾ email@domain.com",
+    passLabel:"ಪಾಸ್‌ವರ್ಡ್",passPh:"ಪಾಸ್‌ವರ್ಡ್ ನಮೂದಿಸಿ",
+    loginBtn:"ಸಿಸ್ಟಮ್‌ಗೆ ಪ್ರವೇಶಿಸಿ",
+    terms:"ಲಾಗಿನ್ ಮಾಡುವ ಮೂಲಕ ನೀವು IT ಕಾಯ್ದೆ 2000 & CERT-In ಮಾರ್ಗಸೂಚಿಗಳಿಗೆ ಒಪ್ಪಿಗೆ ನೀಡುತ್ತೀರಿ",
+    fullNameLabel:"ಪೂರ್ಣ ಹೆಸರು",fullNamePh:"ಆಧಾರ್ ಪ್ರಕಾರ",
+    mobileLabel2:"ಮೊಬೈಲ್ ನಂಬರ್",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ಇಮೇಲ್ ID",emailPh:"email@domain.com",
+    createPassLabel:"ಪಾಸ್‌ವರ್ಡ್ ರಚಿಸಿ",createPassPh:"ಕನಿಷ್ಠ 8 ಅಕ್ಷರಗಳು, 1 ದೊಡ್ಡ ಅಕ್ಷರ, 1 ಚಿಹ್ನೆ",
+    stateLabel:"ರಾಜ್ಯ",selectState:"ರಾಜ್ಯ ಆಯ್ಕೆ ಮಾಡಿ",
+    registerBtn:"ಸುರಕ್ಷಿತ ಖಾತೆ ರಚಿಸಿ",
+    navMain:"ಮುಖ್ಯ",navOverview:"📊 ಅವಲೋಕನ",navSafety:"🛡 ಸಾಧನ ಸುರಕ್ಷತೆ",
+    navEngines:"ಇಂಜಿನ್‌ಗಳು",navDetect:"⚙ ಪತ್ತೆ ಇಂಜಿನ್‌ಗಳು",navLive:"🔬 ಲೈವ್ ಟೆಸ್ಟ್",
+    navAction:"ಕ್ರಮ",navFir:"📋 FIR ಜನರೇಟರ್",navThreats:"⚠ ಸಕ್ರಿಯ ಬೆದರಿಕೆಗಳು",navTips:"💡 ಸೈಬರ್ ಸಲಹೆಗಳು",
+    logout:"ಲಾಗ್ ಔಟ್",
+    threatBanner:"ಲೈವ್ ಥ್ರೆಟ್ ಫೀಡ್: ತಮಿಳುನಾಡಿನಲ್ಲಿ 3 ಡೀಪ್‌ಫೇಕ್ ಅಭಿಯಾನಗಳು | ಇಂದು 7 ಫಿಶಿಂಗ್ ಡೊಮೇನ್‌ಗಳು | ವಾಯ್ಸ್ ಕ್ಲೋನ್ ಪ್ರಯತ್ನ ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ",
+    notifications:"ಅಧಿಸೂಚನೆಗಳು",
+    notif1Title:"ಸಮೀಪದಲ್ಲಿ ಡೀಪ್‌ಫೇಕ್ ಪತ್ತೆಯಾಗಿದೆ",notif1Sub:"ತಮಿಳುನಾಡು — 3 ಘಟನೆಗಳು",notif1Time:"2 ನಿಮಿಷಗಳ ಹಿಂದೆ",
+    notif2Title:"ಅನುಮಾನಾಸ್ಪದ APK ಗಳು ಕಂಡುಬಂದಿವೆ",notif2Sub:"3 ಅಪ್ಲಿಕೇಶನ್‌ಗಳು ಅಸಾಮಾನ್ಯ ಅನುಮತಿಗಳನ್ನು ಕೇಳುತ್ತಿವೆ",notif2Time:"18 ನಿಮಿಷಗಳ ಹಿಂದೆ",
+    notif3Title:"WiFi ಭದ್ರತಾ ಎಚ್ಚರಿಕೆ",notif3Sub:"ನೆಟ್‌ವರ್ಕ್ WPA2 ಬಳಸುತ್ತಿದೆ — ಅಪ್‌ಗ್ರೇಡ್ ಮಾಡಿ",notif3Time:"1 ಗಂಟೆ ಹಿಂದೆ",
+    notif4Title:"ಡೇಟಾ ಉಲ್ಲಂಘನೆ ಎಚ್ಚರಿಕೆ",notif4Sub:"ಇಮೇಲ್ 2 ಉಲ್ಲಂಘನೆ ಡೇಟಾಬೇಸ್‌ಗಳಲ್ಲಿ ಕಂಡುಬಂದಿದೆ",notif4Time:"3 ಗಂಟೆ ಹಿಂದೆ",
+    notif5Title:"CERT-In ಸಲಹೆ",notif5Sub:"ಭಾರತೀಯ ಬ್ಯಾಂಕ್‌ಗಳನ್ನು ಗುರಿಯಾಗಿಸಿ ಹೊಸ ಫಿಶಿಂಗ್ ಅಭಿಯಾನ",notif5Time:"ಇಂದು",
+    scanBtn:"ಸಂಪೂರ್ಣ ಸಾಧನ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",safetyScore:"ಭದ್ರತಾ ಸ್ಕೋರ್ / 100",
+    overview:"ಅವಲೋಕನ",deviceSafety:"ಸಾಧನ ಸುರಕ್ಷತೆ",detectionEngines:"ಪತ್ತೆ ಇಂಜಿನ್‌ಗಳು",liveTest:"ಲೈವ್ ಟೆಸ್ಟ್",firGen:"FIR ಜನರೇಟರ್",activeThreats:"ಸಕ್ರಿಯ ಬೆದರಿಕೆಗಳು",cyberTips:"ಸೈಬರ್ ಭದ್ರತಾ ಸಲಹೆಗಳು",
+  },
+  ml:{
+    logoSub:"ഇന്ത്യയുടെ ആദ്യ AI സൈബർ സംരക്ഷകൻ",
+    loginTab:"ലോഗിൻ",registerTab:"രജിസ്ട്രേഷൻ",
+    mobileLabel:"മൊബൈൽ / ഇമെയിൽ",mobilePh:"+91 9XXXXXXXXX അല്ലെങ്കിൽ email@domain.com",
+    passLabel:"പാസ്‌വേഡ്",passPh:"പാസ്‌വേഡ് നൽകുക",
+    loginBtn:"സിസ്റ്റത്തിൽ പ്രവേശിക്കുക",
+    terms:"ലോഗിൻ ചെയ്യുന്നതിലൂടെ IT നിയമം 2000 & CERT-In മാർഗ്ഗനിർദ്ദേശങ്ങൾ അംഗീകരിക്കുന്നു",
+    fullNameLabel:"പൂർണ്ണ പേര്",fullNamePh:"ആധാർ പ്രകാരം",
+    mobileLabel2:"മൊബൈൽ നമ്പർ",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ഇമെയിൽ ID",emailPh:"email@domain.com",
+    createPassLabel:"പാസ്‌വേഡ് ഉണ്ടാക്കുക",createPassPh:"കുറഞ്ഞത് 8 അക്ഷരങ്ങൾ, 1 വലിയ അക്ഷരം, 1 ചിഹ്നം",
+    stateLabel:"സംസ്ഥാനം",selectState:"സംസ്ഥാനം തിരഞ്ഞെടുക്കുക",
+    registerBtn:"സുരക്ഷിത അക്കൗണ്ട് ഉണ്ടാക്കുക",
+    navMain:"പ്രധാന",navOverview:"📊 അവലോകനം",navSafety:"🛡 ഉപകരണ സുരക്ഷ",
+    navEngines:"എഞ്ചിനുകൾ",navDetect:"⚙ കണ്ടെത്തൽ എഞ്ചിനുകൾ",navLive:"🔬 തത്സമയ പരീക്ഷ",
+    navAction:"നടപടി",navFir:"📋 FIR ജനറേറ്റർ",navThreats:"⚠ സജീവ ഭീഷണികൾ",navTips:"💡 സൈബർ നുറുങ്ങുകൾ",
+    logout:"ലോഗ് ഔട്ട്",
+    threatBanner:"തത്സമയ ഭീഷണി ഫീഡ്: തമിഴ്‌നാട്ടിൽ 3 ഡീപ്‌ഫേക്ക് പ്രചാരണങ്ങൾ | ഇന്ന് 7 ഫിഷിംഗ് ഡൊമൈനുകൾ | വോയ്‌സ് ക്ലോൺ ശ്രമം തടഞ്ഞു",
+    notifications:"അറിയിപ്പുകൾ",
+    notif1Title:"സമീപത്ത് ഡീപ്‌ഫേക്ക് കണ്ടെത്തി",notif1Sub:"തമിഴ്‌നാട് — 3 സംഭവങ്ങൾ",notif1Time:"2 മിനിറ്റ് മുൻപ്",
+    notif2Title:"സംശയകരമായ APK കൾ കണ്ടെത്തി",notif2Sub:"3 ആപ്പുകൾ അസാധാരണ അനുമതികൾ ചോദിക്കുന്നു",notif2Time:"18 മിനിറ്റ് മുൻപ്",
+    notif3Title:"WiFi സുരക്ഷ മുന്നറിയിപ്പ്",notif3Sub:"നെറ്റ്‌വർക്ക് WPA2 ഉപയോഗിക്കുന്നു — അപ്‌ഗ്രേഡ് ചെയ്യുക",notif3Time:"1 മണിക്കൂർ മുൻപ്",
+    notif4Title:"ഡേറ്റ ലംഘന മുന്നറിയിപ്പ്",notif4Sub:"ഇമെയിൽ 2 ലംഘന ഡേറ്റാബേസുകളിൽ കണ്ടെത്തി",notif4Time:"3 മണിക്കൂർ മുൻപ്",
+    notif5Title:"CERT-In ഉപദേശം",notif5Sub:"ഇന്ത്യൻ ബാങ്കുകളെ ലക്ഷ്യമിട്ട് പുതിയ ഫിഷിംഗ് പ്രചാരണം",notif5Time:"ഇന്ന്",
+    scanBtn:"പൂർണ്ണ ഉപകരണ സ്‌കാൻ നടത്തുക",safetyScore:"സുരക്ഷാ സ്കോർ / 100",
+    overview:"അവലോകനം",deviceSafety:"ഉപകരണ സുരക്ഷ",detectionEngines:"കണ്ടെത്തൽ എഞ്ചിനുകൾ",liveTest:"തത്സമയ പരീക്ഷ",firGen:"FIR ജനറേറ്റർ",activeThreats:"സജീവ ഭീഷണികൾ",cyberTips:"സൈബർ സുരക്ഷ നുറുങ്ങുകൾ",
+  },
+  mr:{
+    logoSub:"भारताचा पहिला AI सायबर संरक्षक",
+    loginTab:"लॉगिन",registerTab:"नोंदणी",
+    mobileLabel:"मोबाईल / ईमेल",mobilePh:"+91 9XXXXXXXXX किंवा email@domain.com",
+    passLabel:"पासवर्ड",passPh:"पासवर्ड प्रविष्ट करा",
+    loginBtn:"सिस्टीममध्ये प्रवेश करा",
+    terms:"लॉगिन करून तुम्ही IT कायदा 2000 व CERT-In मार्गदर्शक तत्त्वांशी सहमत आहात",
+    fullNameLabel:"पूर्ण नाव",fullNamePh:"आधारप्रमाणे",
+    mobileLabel2:"मोबाईल नंबर",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ईमेल ID",emailPh:"email@domain.com",
+    createPassLabel:"पासवर्ड तयार करा",createPassPh:"किमान 8 वर्ण, 1 कॅपिटल, 1 चिन्ह",
+    stateLabel:"राज्य",selectState:"राज्य निवडा",
+    registerBtn:"सुरक्षित खाते तयार करा",
+    navMain:"मुख्य",navOverview:"📊 आढावा",navSafety:"🛡 डिव्हाइस सुरक्षा",
+    navEngines:"इंजिने",navDetect:"⚙ शोध इंजिने",navLive:"🔬 थेट चाचणी",
+    navAction:"कृती",navFir:"📋 FIR जनरेटर",navThreats:"⚠ सक्रिय धोके",navTips:"💡 सायबर टिप्स",
+    logout:"लॉगआउट",
+    threatBanner:"थेट धोका फीड: तमिळनाडूत 3 डीपफेक मोहिमा | आज 7 फिशिंग डोमेन | व्हॉइस क्लोन प्रयत्न रोखला",
+    notifications:"सूचना",
+    notif1Title:"जवळपास डीपफेक आढळले",notif1Sub:"तमिळनाडू — 3 घटना",notif1Time:"2 मिनिटांपूर्वी",
+    notif2Title:"संशयास्पद APK आढळले",notif2Sub:"3 अ‍ॅप्स असाधारण परवानगी मागत आहेत",notif2Time:"18 मिनिटांपूर्वी",
+    notif3Title:"WiFi सुरक्षा इशारा",notif3Sub:"नेटवर्क WPA2 वापरते — अपग्रेड करा",notif3Time:"1 तासापूर्वी",
+    notif4Title:"डेटा उल्लंघन इशारा",notif4Sub:"ईमेल 2 उल्लंघन डेटाबेसमध्ये आढळले",notif4Time:"3 तासांपूर्वी",
+    notif5Title:"CERT-In सल्ला",notif5Sub:"भारतीय बँकांना लक्ष्य करणारी नवीन फिशिंग मोहीम",notif5Time:"आज",
+    scanBtn:"संपूर्ण डिव्हाइस स्कॅन करा",safetyScore:"सुरक्षा स्कोर / 100",
+    overview:"आढावा",deviceSafety:"डिव्हाइस सुरक्षा",detectionEngines:"शोध इंजिने",liveTest:"थेट चाचणी",firGen:"FIR जनरेटर",activeThreats:"सक्रिय धोके",cyberTips:"सायबर सुरक्षा टिप्स",
+  },
+  gu:{
+    logoSub:"ભારતનો પ્રથમ AI સાઇબર રક્ષક",
+    loginTab:"લૉગ ઇન",registerTab:"નોંધણી",
+    mobileLabel:"મોબાઇલ / ઇમેઇલ",mobilePh:"+91 9XXXXXXXXX અથવા email@domain.com",
+    passLabel:"પાસવર્ડ",passPh:"પાસવર્ડ દાખલ કરો",
+    loginBtn:"સિસ્ટમ ઍક્સેસ કરો",
+    terms:"લૉગ ઇન કરીને તમે IT અધિનિયમ 2000 & CERT-In માર્ગદર્શિકાઓ સ્વીકારો છો",
+    fullNameLabel:"પૂરું નામ",fullNamePh:"આધાર મુજબ",
+    mobileLabel2:"મોબાઇલ નંબર",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ઇમેઇલ ID",emailPh:"email@domain.com",
+    createPassLabel:"પાસવર્ડ બનાવો",createPassPh:"ઓછામાં ઓછા 8 અક્ષર, 1 અપરકેસ, 1 ચિહ્ન",
+    stateLabel:"રાજ્ય",selectState:"રાજ્ય પસંદ કરો",
+    registerBtn:"સુરક્ષિત એકાઉન્ટ બનાવો",
+    navMain:"મુખ્ય",navOverview:"📊 ઝાંખી",navSafety:"🛡 ઉપકરણ સુરક્ષા",
+    navEngines:"એન્જિન",navDetect:"⚙ શોધ એન્જિન",navLive:"🔬 લાઇવ ટેસ્ટ",
+    navAction:"ક્રિયા",navFir:"📋 FIR જનરેટર",navThreats:"⚠ સક્રિય જોખમો",navTips:"💡 સાઇબર ટિપ્સ",
+    logout:"લૉગ આઉટ",
+    threatBanner:"લાઇવ ખતરો ફીડ: તમિળનાડુમાં 3 ડીપફેક ઝુંબેશ | આજે 7 ફિશિંગ ડોમેન | વૉઇસ ક્લોન પ્રયાસ અવરોધ્યો",
+    notifications:"સૂચનાઓ",
+    notif1Title:"નજીકમાં ડીપફેક મળ્યો",notif1Sub:"તમિળનાડુ — 3 ઘટનાઓ",notif1Time:"2 મિનિટ પહેલાં",
+    notif2Title:"શંકાસ્પદ APK મળ્યા",notif2Sub:"3 ઍપ્સ અસામાન્ય પરવાનગી માંગે છે",notif2Time:"18 મિનિટ પહેલાં",
+    notif3Title:"WiFi સુરક્ષા ચેતવણી",notif3Sub:"નેટવર્ક WPA2 વાપરે છે — અપગ્રેડ કરો",notif3Time:"1 કલાક પહેલાં",
+    notif4Title:"ડેટા ઉલ્લંઘન ચેતવણી",notif4Sub:"ઇમેઇલ 2 ઉલ્લંઘન ડેટાબેઝમાં મળ્યો",notif4Time:"3 કલાક પહેલાં",
+    notif5Title:"CERT-In સૂચના",notif5Sub:"ભારતીય બેંકોને લક્ષ્ય કરતી નવી ફિશિંગ ઝુંબેશ",notif5Time:"આજે",
+    scanBtn:"સંપૂર્ણ ઉપકરણ સ્કૅન ચલાવો",safetyScore:"સુરક્ષા સ્કોર / 100",
+    overview:"ઝાંખી",deviceSafety:"ઉપકરણ સુરક્ષા",detectionEngines:"શોધ એન્જિન",liveTest:"લાઇવ ટેસ્ટ",firGen:"FIR જનરેટર",activeThreats:"સક્રિય જોખમો",cyberTips:"સાઇબર સુરક્ષા ટિપ્સ",
+  },
+  bn:{
+    logoSub:"ভারতের প্রথম AI সাইবার অভিভাবক",
+    loginTab:"লগইন",registerTab:"নিবন্ধন",
+    mobileLabel:"মোবাইল / ইমেইল",mobilePh:"+91 9XXXXXXXXX অথবা email@domain.com",
+    passLabel:"পাসওয়ার্ড",passPh:"পাসওয়ার্ড লিখুন",
+    loginBtn:"সিস্টেমে প্রবেশ করুন",
+    terms:"লগইন করে আপনি IT আইন 2000 ও CERT-In নির্দেশিকায় সম্মত হচ্ছেন",
+    fullNameLabel:"পূর্ণ নাম",fullNamePh:"আধার অনুযায়ী",
+    mobileLabel2:"মোবাইল নম্বর",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ইমেইল ID",emailPh:"email@domain.com",
+    createPassLabel:"পাসওয়ার্ড তৈরি করুন",createPassPh:"কমপক্ষে 8 অক্ষর, 1 বড় হাতের অক্ষর, 1 চিহ্ন",
+    stateLabel:"রাজ্য",selectState:"রাজ্য নির্বাচন করুন",
+    registerBtn:"নিরাপদ অ্যাকাউন্ট তৈরি করুন",
+    navMain:"প্রধান",navOverview:"📊 সংক্ষিপ্ত বিবরণ",navSafety:"🛡 ডিভাইস নিরাপত্তা",
+    navEngines:"ইঞ্জিন",navDetect:"⚙ সনাক্তকরণ ইঞ্জিন",navLive:"🔬 লাইভ টেস্ট",
+    navAction:"পদক্ষেপ",navFir:"📋 FIR জেনারেটর",navThreats:"⚠ সক্রিয় হুমকি",navTips:"💡 সাইবার টিপস",
+    logout:"লগ আউট",
+    threatBanner:"লাইভ থ্রেট ফিড: তামিলনাড়ুতে ৩টি ডিপফেক প্রচারণা | আজ ৭টি ফিশিং ডোমেন | ভয়েস ক্লোন প্রচেষ্টা ব্লক",
+    notifications:"বিজ্ঞপ্তি",
+    notif1Title:"কাছে ডিপফেক সনাক্ত হয়েছে",notif1Sub:"তামিলনাড়ু — ৩টি ঘটনা",notif1Time:"২ মিনিট আগে",
+    notif2Title:"সন্দেহজনক APK পাওয়া গেছে",notif2Sub:"৩টি অ্যাপ অস্বাভাবিক অনুমতি চাইছে",notif2Time:"১৮ মিনিট আগে",
+    notif3Title:"WiFi নিরাপত্তা সতর্কতা",notif3Sub:"নেটওয়ার্ক WPA2 ব্যবহার করছে — আপগ্রেড করুন",notif3Time:"১ ঘণ্টা আগে",
+    notif4Title:"ডেটা লঙ্ঘন সতর্কতা",notif4Sub:"ইমেইল ২টি লঙ্ঘন ডেটাবেসে পাওয়া গেছে",notif4Time:"৩ ঘণ্টা আগে",
+    notif5Title:"CERT-In পরামর্শ",notif5Sub:"ভারতীয় ব্যাংককে লক্ষ্য করে নতুন ফিশিং প্রচারণা",notif5Time:"আজ",
+    scanBtn:"সম্পূর্ণ ডিভাইস স্ক্যান চালান",safetyScore:"নিরাপত্তা স্কোর / ১০০",
+    overview:"সংক্ষিপ্ত বিবরণ",deviceSafety:"ডিভাইস নিরাপত্তা",detectionEngines:"সনাক্তকরণ ইঞ্জিন",liveTest:"লাইভ টেস্ট",firGen:"FIR জেনারেটর",activeThreats:"সক্রিয় হুমকি",cyberTips:"সাইবার নিরাপত্তা টিপস",
+  },
+  pa:{
+    logoSub:"ਭਾਰਤ ਦਾ ਪਹਿਲਾ AI ਸਾਈਬਰ ਰਾਖਾ",
+    loginTab:"ਲੌਗਿਨ",registerTab:"ਰਜਿਸਟਰ",
+    mobileLabel:"ਮੋਬਾਈਲ / ਈਮੇਲ",mobilePh:"+91 9XXXXXXXXX ਜਾਂ email@domain.com",
+    passLabel:"ਪਾਸਵਰਡ",passPh:"ਪਾਸਵਰਡ ਦਰਜ ਕਰੋ",
+    loginBtn:"ਸਿਸਟਮ ਵਿੱਚ ਦਾਖਲ ਹੋਵੋ",
+    terms:"ਲੌਗਿਨ ਕਰਕੇ ਤੁਸੀਂ IT ਐਕਟ 2000 ਅਤੇ CERT-In ਦਿਸ਼ਾ-ਨਿਰਦੇਸ਼ਾਂ ਨਾਲ ਸਹਿਮਤ ਹੋ",
+    fullNameLabel:"ਪੂਰਾ ਨਾਮ",fullNamePh:"ਆਧਾਰ ਅਨੁਸਾਰ",
+    mobileLabel2:"ਮੋਬਾਈਲ ਨੰਬਰ",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ਈਮੇਲ ID",emailPh:"email@domain.com",
+    createPassLabel:"ਪਾਸਵਰਡ ਬਣਾਓ",createPassPh:"ਘੱਟੋ-ਘੱਟ 8 ਅੱਖਰ, 1 ਵੱਡਾ ਅੱਖਰ, 1 ਚਿੰਨ੍ਹ",
+    stateLabel:"ਰਾਜ",selectState:"ਰਾਜ ਚੁਣੋ",
+    registerBtn:"ਸੁਰੱਖਿਅਤ ਖਾਤਾ ਬਣਾਓ",
+    navMain:"ਮੁੱਖ",navOverview:"📊 ਸੰਖੇਪ",navSafety:"🛡 ਡਿਵਾਈਸ ਸੁਰੱਖਿਆ",
+    navEngines:"ਇੰਜਣ",navDetect:"⚙ ਖੋਜ ਇੰਜਣ",navLive:"🔬 ਲਾਈਵ ਟੈਸਟ",
+    navAction:"ਕਾਰਵਾਈ",navFir:"📋 FIR ਜਨਰੇਟਰ",navThreats:"⚠ ਸਰਗਰਮ ਖਤਰੇ",navTips:"💡 ਸਾਈਬਰ ਸੁਝਾਅ",
+    logout:"ਲੌਗ ਆਉਟ",
+    threatBanner:"ਲਾਈਵ ਖਤਰਾ ਫੀਡ: ਤਮਿਲਨਾਡੂ ਵਿੱਚ 3 ਡੀਪਫੇਕ ਮੁਹਿੰਮਾਂ | ਅੱਜ 7 ਫਿਸ਼ਿੰਗ ਡੋਮੇਨ | ਵੌਇਸ ਕਲੋਨ ਕੋਸ਼ਿਸ਼ ਬਲੌਕ",
+    notifications:"ਸੂਚਨਾਵਾਂ",
+    notif1Title:"ਨੇੜੇ ਡੀਪਫੇਕ ਮਿਲਿਆ",notif1Sub:"ਤਮਿਲਨਾਡੂ — 3 ਘਟਨਾਵਾਂ",notif1Time:"2 ਮਿੰਟ ਪਹਿਲਾਂ",
+    notif2Title:"ਸ਼ੱਕੀ APK ਮਿਲੇ",notif2Sub:"3 ਐਪਸ ਅਸਾਧਾਰਣ ਇਜਾਜ਼ਤਾਂ ਮੰਗ ਰਹੀਆਂ ਹਨ",notif2Time:"18 ਮਿੰਟ ਪਹਿਲਾਂ",
+    notif3Title:"WiFi ਸੁਰੱਖਿਆ ਚੇਤਾਵਨੀ",notif3Sub:"ਨੈੱਟਵਰਕ WPA2 ਵਰਤਦਾ ਹੈ — ਅੱਪਗ੍ਰੇਡ ਕਰੋ",notif3Time:"1 ਘੰਟਾ ਪਹਿਲਾਂ",
+    notif4Title:"ਡਾਟਾ ਉਲੰਘਣਾ ਚੇਤਾਵਨੀ",notif4Sub:"ਈਮੇਲ 2 ਉਲੰਘਣਾ ਡੇਟਾਬੇਸ ਵਿੱਚ ਮਿਲੀ",notif4Time:"3 ਘੰਟੇ ਪਹਿਲਾਂ",
+    notif5Title:"CERT-In ਸਲਾਹ",notif5Sub:"ਭਾਰਤੀ ਬੈਂਕਾਂ ਨੂੰ ਨਿਸ਼ਾਨਾ ਬਣਾਉਂਦੀ ਨਵੀਂ ਫਿਸ਼ਿੰਗ ਮੁਹਿੰਮ",notif5Time:"ਅੱਜ",
+    scanBtn:"ਪੂਰਾ ਡਿਵਾਈਸ ਸਕੈਨ ਕਰੋ",safetyScore:"ਸੁਰੱਖਿਆ ਸਕੋਰ / 100",
+    overview:"ਸੰਖੇਪ",deviceSafety:"ਡਿਵਾਈਸ ਸੁਰੱਖਿਆ",detectionEngines:"ਖੋਜ ਇੰਜਣ",liveTest:"ਲਾਈਵ ਟੈਸਟ",firGen:"FIR ਜਨਰੇਟਰ",activeThreats:"ਸਰਗਰਮ ਖਤਰੇ",cyberTips:"ਸਾਈਬਰ ਸੁਰੱਖਿਆ ਸੁਝਾਅ",
+  },
+  or:{
+    logoSub:"ଭାରତର ପ୍ରଥମ AI ସାଇବର ସଂରକ୍ଷକ",
+    loginTab:"ଲଗ ଇନ",registerTab:"ପଞ୍ଜୀକରଣ",
+    mobileLabel:"ମୋବାଇଲ / ଇମେଲ",mobilePh:"+91 9XXXXXXXXX ବା email@domain.com",
+    passLabel:"ପାସୱାର୍ଡ",passPh:"ପାସୱାର୍ଡ ଦାଖଲ କରନ୍ତୁ",
+    loginBtn:"ସିଷ୍ଟମ ଆକ୍ସେସ କରନ୍ତୁ",
+    terms:"ଲଗ ଇନ ଦ୍ୱାରା ଆପଣ IT ଆଇନ 2000 ଓ CERT-In ନିର୍ଦ୍ଦେଶାବଳୀ ସହ ସହମତ ଅଛନ୍ତି",
+    fullNameLabel:"ସମ୍ପୂର୍ଣ ନାମ",fullNamePh:"ଆଧାର ଅନୁଯାୟୀ",
+    mobileLabel2:"ମୋବାଇଲ ନମ୍ବର",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ଇମେଲ ID",emailPh:"email@domain.com",
+    createPassLabel:"ପାସୱାର୍ଡ ତିଆରି କରନ୍ତୁ",createPassPh:"ଅତ୍ କମ 8 ଅକ୍ଷର, 1 ବଡ ଅକ୍ଷର, 1 ଚିହ୍ନ",
+    stateLabel:"ରାଜ୍ୟ",selectState:"ରାଜ୍ୟ ବାଛନ୍ତୁ",
+    registerBtn:"ସୁରକ୍ଷିତ ଖାତା ତିଆରି କରନ୍ତୁ",
+    navMain:"ମୁଖ୍ୟ",navOverview:"📊 ସଂକ୍ଷିପ୍ତ",navSafety:"🛡 ଡିଭାଇସ ସୁରକ୍ଷା",
+    navEngines:"ଇଞ୍ଜିନ",navDetect:"⚙ ଚିହ୍ନଟ ଇଞ୍ଜିନ",navLive:"🔬 ଲାଇଭ ଟେଷ୍ଟ",
+    navAction:"କାର୍ଯ୍ୟ",navFir:"📋 FIR ଜେନେରେଟର",navThreats:"⚠ ସକ୍ରିୟ ବିପଦ",navTips:"💡 ସାଇବର ଟିପ୍ସ",
+    logout:"ଲଗ ଆଉଟ",
+    threatBanner:"ଲାଇଭ ବିପଦ ଫିଡ: ତାମିଲନାଡୁରେ 3 ଡିପଫେକ ଅଭିଯାନ | ଆଜି 7 ଫିସିଂ ଡୋମେନ | ଭଏସ କ୍ଲୋନ ପ୍ରୟାସ ବ୍ଲକ",
+    notifications:"ବିଜ୍ଞପ୍ତି",
+    notif1Title:"ନିକଟରେ ଡିପଫେକ ଚିହ୍ନଟ",notif1Sub:"ତାମିଲନାଡୁ — 3 ଘଟଣା",notif1Time:"2 ମିନିଟ ପୂର୍ବେ",
+    notif2Title:"ସନ୍ଦେହଜନକ APK ମିଳିଛି",notif2Sub:"3 ଆପ ଅସ୍ୱାଭାବିକ ଅନୁମତି ମାଗୁଛି",notif2Time:"18 ମିନିଟ ପୂର୍ବେ",
+    notif3Title:"WiFi ସୁରକ୍ଷା ସତର୍କତା",notif3Sub:"ନେଟୱାର୍କ WPA2 ବ୍ୟବହାର କରୁଛି — ଅପଗ୍ରେଡ କରନ୍ତୁ",notif3Time:"1 ଘଣ୍ଟା ପୂର୍ବେ",
+    notif4Title:"ଡାଟା ଉଲ୍ଲଂଘନ ସତର୍କତା",notif4Sub:"ଇମେଲ 2 ଉଲ୍ଲଂଘନ ଡାଟାବେସରେ ମିଳିଛି",notif4Time:"3 ଘଣ୍ଟା ପୂର୍ବେ",
+    notif5Title:"CERT-In ପରାମର୍ଶ",notif5Sub:"ଭାରତୀୟ ବ୍ୟାଙ୍କକୁ ଲକ୍ଷ୍ୟ କରି ନୂଆ ଫିସିଂ ଅଭିଯାନ",notif5Time:"ଆଜି",
+    scanBtn:"ସମ୍ପୂର୍ଣ ଡିଭାଇସ ସ୍କ୍ୟାନ ଚଲାନ୍ତୁ",safetyScore:"ସୁରକ୍ଷା ସ୍କୋର / 100",
+    overview:"ସଂକ୍ଷିପ୍ତ",deviceSafety:"ଡିଭାଇସ ସୁରକ୍ଷା",detectionEngines:"ଚିହ୍ନଟ ଇଞ୍ଜିନ",liveTest:"ଲାଇଭ ଟେଷ୍ଟ",firGen:"FIR ଜେନେରେଟର",activeThreats:"ସକ୍ରିୟ ବିପଦ",cyberTips:"ସାଇବର ସୁରକ୍ଷା ଟିପ୍ସ",
+  },
+  ur:{
+    logoSub:"بھارت کا پہلا AI سائبر محافظ",
+    loginTab:"لاگ ان",registerTab:"رجسٹریشن",
+    mobileLabel:"موبائل / ای میل",mobilePh:"+91 9XXXXXXXXX یا email@domain.com",
+    passLabel:"پاسورڈ",passPh:"پاسورڈ درج کریں",
+    loginBtn:"سسٹم میں داخل ہوں",
+    terms:"لاگ ان کر کے آپ IT ایکٹ 2000 اور CERT-In رہنما اصولوں سے متفق ہیں",
+    fullNameLabel:"پورا نام",fullNamePh:"آدھار کے مطابق",
+    mobileLabel2:"موبائل نمبر",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ای میل ID",emailPh:"email@domain.com",
+    createPassLabel:"پاسورڈ بنائیں",createPassPh:"کم از کم 8 حروف، 1 بڑا حرف، 1 نشان",
+    stateLabel:"ریاست",selectState:"ریاست منتخب کریں",
+    registerBtn:"محفوظ اکاؤنٹ بنائیں",
+    navMain:"اہم",navOverview:"📊 جائزہ",navSafety:"🛡 ڈیوائس سیکیورٹی",
+    navEngines:"انجن",navDetect:"⚙ شناخت انجن",navLive:"🔬 لائیو ٹیسٹ",
+    navAction:"کارروائی",navFir:"📋 FIR جنریٹر",navThreats:"⚠ فعال خطرات",navTips:"💡 سائبر تجاویز",
+    logout:"لاگ آؤٹ",
+    threatBanner:"لائیو خطرہ فیڈ: تمل ناڈو میں 3 ڈیپ فیک مہمیں | آج 7 فشنگ ڈومین | وائس کلون کوشش بلاک",
+    notifications:"اطلاعات",
+    notif1Title:"قریب ڈیپ فیک ملا",notif1Sub:"تمل ناڈو — 3 واقعات",notif1Time:"2 منٹ پہلے",
+    notif2Title:"مشکوک APK ملے",notif2Sub:"3 ایپس غیر معمولی اجازتیں مانگ رہی ہیں",notif2Time:"18 منٹ پہلے",
+    notif3Title:"WiFi سیکیورٹی انتباہ",notif3Sub:"نیٹ ورک WPA2 استعمال کرتا ہے — اپ گریڈ کریں",notif3Time:"1 گھنٹہ پہلے",
+    notif4Title:"ڈیٹا خلاف ورزی انتباہ",notif4Sub:"ای میل 2 خلاف ورزی ڈیٹابیس میں ملی",notif4Time:"3 گھنٹے پہلے",
+    notif5Title:"CERT-In مشورہ",notif5Sub:"بھارتی بینکوں کو نشانہ بناتی نئی فشنگ مہم",notif5Time:"آج",
+    scanBtn:"مکمل ڈیوائس اسکین چلائیں",safetyScore:"سیکیورٹی اسکور / 100",
+    overview:"جائزہ",deviceSafety:"ڈیوائس سیکیورٹی",detectionEngines:"شناخت انجن",liveTest:"لائیو ٹیسٹ",firGen:"FIR جنریٹر",activeThreats:"فعال خطرات",cyberTips:"سائبر سیکیورٹی تجاویز",
+  },
+  as:{
+    logoSub:"ভাৰতৰ প্ৰথম AI চাইবাৰ ৰক্ষক",
+    loginTab:"লগ ইন",registerTab:"পঞ্জীয়ন",
+    mobileLabel:"মোবাইল / ইমেইল",mobilePh:"+91 9XXXXXXXXX অথবা email@domain.com",
+    passLabel:"পাছৱৰ্ড",passPh:"পাছৱৰ্ড দিয়ক",
+    loginBtn:"ছিষ্টেমত প্ৰৱেশ কৰক",
+    terms:"লগ ইন কৰি আপুনি IT আইন 2000 আৰু CERT-In নিৰ্দেশাৱলীৰ সৈতে সন্মত",
+    fullNameLabel:"সম্পূৰ্ণ নাম",fullNamePh:"আধাৰ অনুযায়ী",
+    mobileLabel2:"মোবাইল নম্বৰ",mobilePh2:"+91 9XXXXXXXXX",
+    emailLabel:"ইমেইল ID",emailPh:"email@domain.com",
+    createPassLabel:"পাছৱৰ্ড বনাওক",createPassPh:"কমপক্ষে 8 আখৰ, 1 ডাঙৰ আখৰ, 1 চিহ্ন",
+    stateLabel:"ৰাজ্য",selectState:"ৰাজ্য বাছক",
+    registerBtn:"সুৰক্ষিত একাউণ্ট বনাওক",
+    navMain:"মুখ্য",navOverview:"📊 সংক্ষিপ্ত",navSafety:"🛡 ডিভাইচ সুৰক্ষা",
+    navEngines:"ইঞ্জিন",navDetect:"⚙ চিনাক্তকৰণ ইঞ্জিন",navLive:"🔬 লাইভ পৰীক্ষা",
+    navAction:"কাৰ্য",navFir:"📋 FIR জেনেৰেটৰ",navThreats:"⚠ সক্ৰিয় বিপদ",navTips:"💡 চাইবাৰ টিপছ",
+    logout:"লগ আউট",
+    threatBanner:"লাইভ বিপদ ফিড: তামিলনাডুত 3 ডিপফেক অভিযান | আজি 7 ফিচিং ডমেইন | ভইচ ক্লোন চেষ্টা বাধা",
+    notifications:"জাননী",
+    notif1Title:"ওচৰত ডিপফেক চিনাক্ত",notif1Sub:"তামিলনাডু — 3 টা ঘটনা",notif1Time:"2 মিনিট আগত",
+    notif2Title:"সন্দেহজনক APK পোৱা গ'ল",notif2Sub:"3 টা এপে অস্বাভাৱিক অনুমতি বিচাৰিছে",notif2Time:"18 মিনিট আগত",
+    notif3Title:"WiFi সুৰক্ষা সতৰ্কতা",notif3Sub:"নেটৱৰ্কে WPA2 ব্যৱহাৰ কৰে — আপগ্ৰেড কৰক",notif3Time:"1 ঘণ্টা আগত",
+    notif4Title:"ডেটা উলংঘনৰ সতৰ্কতা",notif4Sub:"ইমেইল 2 উলংঘন ডেটাবেছত পোৱা গ'ল",notif4Time:"3 ঘণ্টা আগত",
+    notif5Title:"CERT-In পৰামৰ্শ",notif5Sub:"ভাৰতীয় বেংকক লক্ষ্য কৰি নতুন ফিচিং অভিযান",notif5Time:"আজি",
+    scanBtn:"সম্পূৰ্ণ ডিভাইচ স্কেন চলাওক",safetyScore:"সুৰক্ষা স্কোৰ / 100",
+    overview:"সংক্ষিপ্ত",deviceSafety:"ডিভাইচ সুৰক্ষা",detectionEngines:"চিনাক্তকৰণ ইঞ্জিন",liveTest:"লাইভ পৰীক্ষা",firGen:"FIR জেনেৰেটৰ",activeThreats:"সক্ৰিয় বিপদ",cyberTips:"চাইবাৰ সুৰক্ষা টিপছ",
+  },
+};
+
+/* ====== STATE ====== */
+let currentLang = sessionStorage.getItem('shieldLang') || 'en';
+let currentUser = sessionStorage.getItem('shieldUser') || '';
+
+const el = id => document.getElementById(id);
+const t = key => (T[currentLang] && T[currentLang][key]) ? T[currentLang][key] : (T.en[key] || key);
+
+/* ====== LANGUAGE DROPDOWN ====== */
+function buildLangDropdowns() {
+  ['loginLangDrop','dashLangDrop'].forEach(dropId => {
+    const drop = el(dropId);
+    if (!drop) return;
+    drop.innerHTML = '';
+    LANGS.forEach(lang => {
+      const opt = document.createElement('div');
+      opt.className = 'lang-opt' + (lang.code === currentLang ? ' selected' : '');
+      opt.innerHTML = `<span>${lang.native}</span><span style="color:var(--color-text-secondary,#4a6080);font-size:11px;">${lang.label}</span>`;
+      opt.onclick = () => selectLang(lang.code, lang.label, lang.native);
+      drop.appendChild(opt);
+    });
+  });
+}
+
+function toggleLangMenu(dropId) {
+  ['loginLangDrop','dashLangDrop'].forEach(id => {
+    if (id !== dropId) { const d = el(id); if(d) d.classList.remove('open'); }
+  });
+  const drop = el(dropId);
+  if (drop) drop.classList.toggle('open');
+}
+
+function selectLang(code, label, native) {
+  currentLang = code;
+  sessionStorage.setItem('shieldLang', code);
+  ['loginLangDrop','dashLangDrop'].forEach(id => { const d=el(id); if(d) d.classList.remove('open'); });
+  ['loginLangLabel','dashLangLabel'].forEach(id => { const s=el(id); if(s) s.textContent=native; });
+  buildLangDropdowns();
+  applyTranslations();
+}
+
+function applyTranslations() {
+  /* Login screen */
+  const logoSubs = document.querySelectorAll('.logo-sub');
+  logoSubs.forEach(e => e.textContent = t('logoSub'));
+  const tabs = document.querySelectorAll('.tab-btn');
+  if(tabs[0]) tabs[0].textContent = t('loginTab');
+  if(tabs[1]) tabs[1].textContent = t('registerTab');
+  const loginId = el('loginId');
+  if(loginId) loginId.placeholder = t('mobilePh');
+  const loginPass = el('loginPass');
+  if(loginPass) loginPass.placeholder = t('passPh');
+  const loginBtn = document.querySelector('#loginFields .login-btn');
+  if(loginBtn) loginBtn.textContent = t('loginBtn');
+  const terms = document.querySelector('.terms');
+  if(terms) terms.textContent = t('terms');
+  /* Labels in login */
+  const loginLabels = document.querySelectorAll('#loginFields .inp-group label');
+  if(loginLabels[0]) loginLabels[0].textContent = t('mobileLabel');
+  if(loginLabels[1]) loginLabels[1].textContent = t('passLabel');
+  /* Register labels */
+  const regLabels = document.querySelectorAll('#registerFields .inp-group label');
+  if(regLabels[0]) regLabels[0].textContent = t('fullNameLabel');
+  if(regLabels[1]) regLabels[1].textContent = t('mobileLabel2');
+  if(regLabels[2]) regLabels[2].textContent = t('emailLabel');
+  if(regLabels[3]) regLabels[3].textContent = t('createPassLabel');
+  if(regLabels[4]) regLabels[4].textContent = t('stateLabel');
+  const regBtn = document.querySelector('#registerFields .login-btn');
+  if(regBtn) regBtn.textContent = t('registerBtn');
+  /* Register placeholders */
+  const regInps = document.querySelectorAll('#registerFields .inp-group input');
+  if(regInps[0]) regInps[0].placeholder = t('fullNamePh');
+  if(regInps[1]) regInps[1].placeholder = t('mobilePh2');
+  if(regInps[2]) regInps[2].placeholder = t('emailPh');
+  if(regInps[3]) regInps[3].placeholder = t('createPassPh');
+  const stateOpt = document.querySelector('#registerFields select option');
+  if(stateOpt) stateOpt.textContent = t('selectState');
+  /* Dashboard topbar */
+  const logoutBtn = document.querySelector('.topbar-right .btn-sec');
+  if(logoutBtn) logoutBtn.textContent = t('logout');
+  /* Threat banner */
+  const banner = document.querySelector('.threat-banner span');
+  if(banner) banner.textContent = t('threatBanner');
+  /* Sidebar nav */
+  const navSections = document.querySelectorAll('.nav-section');
+  if(navSections[0]) navSections[0].textContent = t('navMain');
+  if(navSections[1]) navSections[1].textContent = t('navEngines');
+  if(navSections[2]) navSections[2].textContent = t('navAction');
+  const navItems = document.querySelectorAll('.nav-item');
+  const navKeys = ['navOverview','navSafety','navDetect','navLive','navFir','navThreats','navTips'];
+  navItems.forEach((ni, i) => { if(navKeys[i]) ni.textContent = t(navKeys[i]); });
+  /* Section headers */
+  const panelHeads = document.querySelectorAll('.panel .section-header h2');
+  const headKeys = ['overview','deviceSafety','detectionEngines','liveTest','firGen','activeThreats','cyberTips'];
+  panelHeads.forEach((ph, i) => { if(headKeys[i]) ph.textContent = t(headKeys[i]); });
+  /* Safety score label */
+  const safeLabel = document.querySelector('.safety-label');
+  if(safeLabel) safeLabel.textContent = t('safetyScore');
+  /* Scan button */
+  const scanBtn = document.querySelector('#panel-safety .btn-pri');
+  if(scanBtn) scanBtn.textContent = t('scanBtn');
+  /* Notifications panel */
+  const notifHeader = document.querySelector('.notif-panel > div:first-child');
+  if(notifHeader) notifHeader.textContent = t('notifications');
+  const notifItems = document.querySelectorAll('.notif-item');
+  const notifData = [
+    ['notif1Title','notif1Sub','notif1Time'],
+    ['notif2Title','notif2Sub','notif2Time'],
+    ['notif3Title','notif3Sub','notif3Time'],
+    ['notif4Title','notif4Sub','notif4Time'],
+    ['notif5Title','notif5Sub','notif5Time'],
+  ];
+  notifItems.forEach((ni, i) => {
+    if(!notifData[i]) return;
+    const divs = ni.querySelectorAll('div');
+    if(divs[1]) divs[1].childNodes[0].textContent = t(notifData[i][0]);
+    const muted = ni.querySelector('[style*="color:var(--muted)"]') || divs[1].querySelector('div');
+    if(muted) muted.textContent = t(notifData[i][1]);
+    const timeEl = ni.querySelector('.notif-time');
+    if(timeEl) timeEl.textContent = t(notifData[i][2]);
+  });
+}
+
+/* ====== SESSION: show correct screen on load ====== */
+window.onload = () => {
+  el('incidentTime').value = new Date().toISOString().slice(0,16);
+  el('wifiName').textContent = wifiNames[Math.floor(Math.random()*wifiNames.length)];
+  buildLangDropdowns();
+  applyTranslations();
+  /* Restore session */
+  if (currentUser) {
+    el('userName').textContent = currentUser;
+    el('loginScreen').classList.remove('active');
+    el('dashScreen').classList.add('active');
+  }
+  /* Set lang labels */
+  const lang = LANGS.find(l => l.code === currentLang) || LANGS[0];
+  ['loginLangLabel','dashLangLabel'].forEach(id => { const s=el(id); if(s) s.textContent=lang.native; });
+};
+
+/* ====== AUTH ====== */
+const wifiNames = ["JioFiber_5G","Airtel_Home_2.4G","BSNL_WiFi","HomeNetwork_5G","Office_Secure"];
+
+function switchTab(t_){
+  el('loginFields').style.display = t_==='login'?'block':'none';
+  el('registerFields').style.display = t_==='register'?'block':'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active',(t_==='login'&&i===0)||(t_==='register'&&i===1));
+  });
+}
+
+function doLogin(){
+  const id = el('loginId')?.value || 'User';
+  const name = id.includes('@') ? id.split('@')[0] : id.slice(0,8) || 'Agent';
+  sessionStorage.setItem('shieldUser', name);
+  currentUser = name;
+  el('userName').textContent = name;
+  el('loginScreen').classList.remove('active');
+  el('dashScreen').classList.add('active');
+  setTimeout(() => showNotifBanner('Welcome back! 3 new threat alerts since your last login.','warn'), 1500);
+}
+
+function doLogout(){
+  sessionStorage.removeItem('shieldUser');
+  currentUser = '';
+  el('dashScreen').classList.remove('active');
+  el('loginScreen').classList.add('active');
+}
+
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el('panel-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if(n.textContent.toLowerCase().includes(name.slice(0,4).toLowerCase())) n.classList.add('active');
+  });
+  if(el('notifPanel').classList.contains('show')) el('notifPanel').classList.remove('show');
+}
+
+function toggleNotif(){ el('notifPanel').classList.toggle('show'); }
+
+function checkStrength(v){
+  let s=0;
+  if(v.length>=8)s++;if(v.length>=12)s++;
+  if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
+  const pct=[0,20,40,60,80,100][s];
+  const col=['#ff3c5f','#ff3c5f','#ff9500','#ff9500','#39ff14','#39ff14'][s];
+  el('passBar').style.width=pct+'%';el('passBar').style.background=col;
+}
+
+function runTest(btn,type){
+  const card=btn.closest('.test-card');
+  const bar=card.querySelector('.progress-fill');
+  const res=card.querySelector('.test-result');
+  btn.textContent='Scanning...';btn.disabled=true;
+  bar.style.width='0%';res.style.display='none';
+  setTimeout(()=>bar.style.width='60%',200);
+  setTimeout(()=>bar.style.width='90%',800);
+  const results={
+    deepfake:{cls:'safe',msg:'No deepfake manipulation detected. Image/video appears authentic. Confidence: 97.2%'},
+    voice:{cls:'warn',msg:'Possible voice synthesis detected. Spectral anomalies found. Confidence: 73%. Recommend further analysis.'},
+    phishing:{cls:'danger',msg:'PHISHING DETECTED! Domain flagged in 4 threat databases. Spoofed sender. Malicious redirect link found.'},
+    wifi:{cls:'warn',msg:'WiFi using WPA2 (outdated). SSID broadcast enabled. Recommend WPA3 upgrade. No active MITM detected.'},
+    apk:{cls:'danger',msg:'MALWARE FOUND! APK requests 23 suspicious permissions. Detected: Banking trojan signature (BankBot.v3). DELETE IMMEDIATELY.'},
+    os:{cls:'safe',msg:'OS is up to date. No critical CVEs found. 2 low-severity patches available. Kernel integrity: OK.'},
+    dataleak:{cls:'danger',msg:'EMAIL FOUND IN 2 DATA BREACHES: LinkedIn 2021 (passwords), Justdial 2023 (mobile numbers). Change passwords NOW.'},
+    upi:{cls:'safe',msg:'UPI ID appears legitimate. No fraud reports found. Registered since 2019. Normal transaction pattern.'}
+  };
+  setTimeout(()=>{
+    bar.style.width='100%';
+    const r=results[type];
+    res.className='test-result '+r.cls;
+    res.textContent=r.msg;res.style.display='block';
+    btn.textContent='Run Again';btn.disabled=false;
+    if(r.cls==='danger')showNotifBanner('Threat detected: '+type.toUpperCase()+' scan flagged critical issue!','danger');
+  },2200);
+}
+
+function runFullScan(){
+  el('scanProgress').style.display='block';
+  const steps=['Scanning system files...','Checking installed apps...','Analyzing network config...','Checking for vulnerabilities...','Updating threat database...','Scan complete!'];
+  let i=0;
+  const bar=el('scanBar');
+  const txt=el('scanText');
+  const iv=setInterval(()=>{
+    txt.textContent=steps[i];
+    bar.style.width=((i+1)/steps.length*100)+'%';
+    i++;if(i>=steps.length){clearInterval(iv);bar.style.background='var(--safe)';}
+  },600);
+}
+
+function generateFIR(){
+  const d=new Date();
+  const ref='FIR/'+d.getFullYear()+'/SA/'+Math.floor(Math.random()*90000+10000);
+  el('firSuccess').style.display='block';
+  el('firSuccess').innerHTML='✓ FIR Generated Successfully! Reference: <strong style="color:var(--acc)">'+ref+'</strong> | Time: '+d.toLocaleString('en-IN')+' IST | This FIR is compliant with IT Act 2000, Section 66, 66C & BNS 2023.';
+}
+
+function downloadFIR(){
+  el('firSuccess').style.display='block';
+  el('firSuccess').innerHTML='📥 FIR PDF download started. File: <strong style="color:var(--acc)">ShieldAI_FIR_'+Date.now()+'.pdf</strong> — In production this would generate a full legal PDF with digital signature, QR code verification, and auto-filled court details.';
+}
+
+function showPermission(){el('firPermBox').style.display='block';el('firPermBox2').style.display='none';}
+function showPermission2(){el('firPermBox2').style.display='block';el('firPermBox').style.display='none';}
+
+function submitFIR(org){
+  el('firPermBox').style.display='none';el('firPermBox2').style.display='none';
+  const tk='CASE/'+Date.now().toString(36).toUpperCase();
+  el('firSuccess').style.display='block';
+  el('firSuccess').innerHTML='✓ FIR submitted to <strong style="color:var(--acc)">'+org+'</strong>. Tracking ID: <strong style="color:var(--acc)">'+tk+'</strong>. You will receive confirmation via SMS & email within 24 hours. Save your tracking ID for follow-up.';
+}
+
+function showNotifBanner(msg,type){
+  const nb=document.createElement('div');
+  nb.style.cssText='position:fixed;bottom:16px;right:16px;max-width:300px;background:var(--card);border:1px solid '+(type==='danger'?'rgba(255,60,95,0.5)':type==='warn'?'rgba(255,149,0,0.5)':'rgba(0,212,255,0.5)')+';border-radius:10px;padding:14px;z-index:2000;font-size:13px;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,0.5)';
+  nb.innerHTML='<div style="color:'+(type==='danger'?'var(--danger)':type==='warn'?'var(--warn)':'var(--acc)')+';font-weight:600;margin-bottom:4px">'+(type==='danger'?'⚠ THREAT ALERT':type==='warn'?'⚡ WARNING':'ℹ INFO')+'</div>'+msg;
+  document.body.appendChild(nb);
+  setTimeout(()=>nb.style.opacity='0',3500);
+  setTimeout(()=>nb.remove(),4000);
+}
+
+document.addEventListener('click', e => {
+  if(el('notifPanel').classList.contains('show') && !e.target.closest('.notif-bell') && !e.target.closest('.notif-panel'))
+    el('notifPanel').classList.remove('show');
+  if(!e.target.closest('.lang-wrap'))
+    document.querySelectorAll('.lang-dropdown').forEach(d => d.classList.remove('open'));
+});
+</script>
